@@ -8,10 +8,13 @@ namespace Three_Dimensional_V3
 {
     internal class Camera
     {
-        float fov;
-        public Camera(float _fov)
+        public float fov;
+        public Point3 pos;
+        float Z0;
+        public Camera(float _fov, Point3 _position)
         {
             fov = _fov;
+            position = _position;
         }
     }
 }

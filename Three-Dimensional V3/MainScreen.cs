@@ -13,7 +13,7 @@ namespace Three_Dimensional_V3
     public partial class MainScreen : UserControl
     {
         /**
-         * Three-Dimensional V3 (Ted Angus)
+         * Three-Dimensional V3 (Made by Ted)
          * Created: 2021/11/29
          * 
          * 
@@ -21,10 +21,66 @@ namespace Three_Dimensional_V3
         */
 
 
-        /** VARIABLES **/
+        /** MAIN VARIABLES **/
         PointF res; // Resolution
+        bool mode3d = false; // 3D?
+
+        /** CAMERA RELATED VARIABLES **/
         Camera camera = new Camera(45); // Camera
 
+
+        /** SHAPE RELATED VARIABLES **/
+        List<Object> objs = new List<Object>(){ 
+            new Object(new List<Triangle3>() {
+                // Front
+                new Triangle3( new Point3[] {
+                    new Point3(-50, -50, -50),
+                    new Point3(-50, 50, -50),
+                    new Point3(50, -50, -50),
+                }),
+                new Triangle3( new Point3[] {
+                    new Point3(50, 50, -50),
+                    new Point3(-50, 50, -50),
+                    new Point3(50, -50, -50),
+                }),
+
+                // Right Side
+                new Triangle3( new Point3[] {
+                    new Point3(50, -50, -50),
+                    new Point3(50, 50, -50),
+                    new Point3(50, -50, 50),
+                }),
+                new Triangle3( new Point3[] {
+                    new Point3(50, 50, 50),
+                    new Point3(50, 50, -50),
+                    new Point3(50, -50, 50),
+                }),
+
+                // Left Side
+                new Triangle3( new Point3[] {
+                    new Point3(-50, -50, -50),
+                    new Point3(-50, 50, -50),
+                    new Point3(-50, -50, 50),
+                }),
+                new Triangle3( new Point3[] {
+                    new Point3(-50, 50, 50),
+                    new Point3(-50, 50, -50),
+                    new Point3(-50, -50, 50),
+                }),
+
+                // Back Side
+                new Triangle3( new Point3[] {
+                    new Point3(-50, -50, 50),
+                    new Point3(-50, 50, 50),
+                    new Point3(50, -50, 50),
+                }),
+                new Triangle3( new Point3[] {
+                    new Point3(50, 50, 50),
+                    new Point3(-50, 50, 50),
+                    new Point3(50, -50, 50),
+                }),
+            }, new Point3(0, 0, 600), new Point3(0, 0, 0))
+        };
 
         /** INIT METHOD **/
         public MainScreen()
