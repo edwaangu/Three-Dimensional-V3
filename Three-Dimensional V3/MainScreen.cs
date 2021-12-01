@@ -44,6 +44,8 @@ namespace Three_Dimensional_V3
         /** SHAPE RELATED VARIABLES **/
         List<Object> objs = new List<Object>(){ 
             new Object(new List<Triangle3>() {
+                /*
+                */
                 // Front
                 new Triangle3( new Point3[] {
                     new Point3(-50, -50, -50),
@@ -91,6 +93,30 @@ namespace Three_Dimensional_V3
                     new Point3(-50, 50, 50),
                     new Point3(50, -50, 50),
                 }),
+
+                // Top Side
+                new Triangle3( new Point3[] {
+                    new Point3(-50, -50, -50),
+                    new Point3(-50, -50, 50),
+                    new Point3(50, -50, -50),
+                }),
+                new Triangle3( new Point3[] {
+                    new Point3(50, -50, 50),
+                    new Point3(-50, -50, 50),
+                    new Point3(50, -50, -50),
+                }),
+                
+                // Bottom Side
+                new Triangle3( new Point3[] {
+                    new Point3(-50, 50, -50),
+                    new Point3(-50, 50, 50),
+                    new Point3(50, 50, -50),
+                }),
+                new Triangle3( new Point3[] {
+                    new Point3(50, 50, 50),
+                    new Point3(-50, 50, 50),
+                    new Point3(50, 50, -50),
+                }),
             }, new Point3(0, 0, 600), new Point3(0, 0, 0))
         };
 
@@ -111,9 +137,9 @@ namespace Three_Dimensional_V3
         /** UPDATE METHOD **/
         private void frameUpdate_Tick(object sender, EventArgs e)
         {
-            objs[0].pos.X++;
-            objs[0].pos.Z++;
-            objs[0].pos.Y ++;
+            //objs[0].pos.X++;
+            objs[0].pos.Z--;
+            //objs[0].pos.Y ++;
             this.Refresh();
         }
 
@@ -128,7 +154,7 @@ namespace Three_Dimensional_V3
                 obj.tris = obj.tris.OrderByDescending(x => x.saidZ).ToList();
                 foreach (Triangle3 tri in obj.tris)
                 {
-                    i += 10;
+                    i += 12;
                     e.Graphics.FillPolygon(new SolidBrush(Color.FromArgb(i, i, i)), tri.PointsOnScreen(camera, obj, res));
                     //e.Graphics.DrawPolygon(new Pen(Color.Black, 2), tri.PointsOnScreen(camera, obj, res));
                 }
