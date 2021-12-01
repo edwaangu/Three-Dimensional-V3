@@ -10,11 +10,10 @@ namespace Three_Dimensional_V3
     {
         public float fov;
         public Point3 pos;
-        float Z0;
-        public Camera(float _fov, Point3 _position)
+        public Camera(float _fov, Point3 _pos)
         {
             fov = _fov;
-            position = _position;
+            pos = _pos;
         }
     }
 }
