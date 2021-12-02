@@ -46,6 +46,8 @@
             this.Name = "MainScreen";
             this.Size = new System.Drawing.Size(800, 450);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.MainScreen_Paint);
+            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.MainScreen_KeyUp);
+            this.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.MainScreen_PreviewKeyDown);
             this.ResumeLayout(false);
 
         }

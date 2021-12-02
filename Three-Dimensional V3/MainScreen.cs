@@ -38,14 +38,13 @@ namespace Three_Dimensional_V3
         PointF res; // Resolution
 
         /** CAMERA RELATED VARIABLES **/
-        Camera camera = new Camera(60, new Point3(0, 0, 0)); // Camera
+        Camera camera = new Camera(60, new Point3(0, 0, 0), new PointF(0, 0)); // Camera
+        bool[] keys = new bool[256];
 
 
         /** SHAPE RELATED VARIABLES **/
         List<Object> objs = new List<Object>(){ 
             new Object(new List<Triangle3>() {
-                /*
-                */
                 // Front
                 new Triangle3( new Point3[] {
                     new Point3(-50, -50, -50),
@@ -57,8 +56,8 @@ namespace Three_Dimensional_V3
                     new Point3(-50, 50, -50),
                     new Point3(50, -50, -50),
                 }),
-
                 // Right Side
+                
                 new Triangle3( new Point3[] {
                     new Point3(50, -50, -50),
                     new Point3(50, 50, -50),
@@ -130,16 +129,54 @@ namespace Three_Dimensional_V3
             {
                 foreach (Triangle3 tri in obj.tris)
                 {
-                    tri.PointsOnScreen(camera, obj, res);
+                    tri.PointsOnScreen(camera, obj, res, 0);
                 }
+            }
+
+            for(int i = 0;i < keys.Length;i++)
+            {
+                keys[i] = false;
             }
         }
         /** UPDATE METHOD **/
         private void frameUpdate_Tick(object sender, EventArgs e)
         {
-            //objs[0].pos.X++;
-            objs[0].pos.Z--;
-            //objs[0].pos.Y ++;
+            if (keys[87])
+            {
+                camera.pos.X += Convert.ToSingle(Math.Cos(camera.direction.X) * 5);
+                camera.pos.Z += Convert.ToSingle(Math.Sin(camera.direction.X) * 5);
+            }
+            if (keys[65])
+            {
+                camera.pos.X += Convert.ToSingle(Math.Cos(camera.direction.X - (90 / (180 / Math.PI))) * 5);
+                camera.pos.Z += Convert.ToSingle(Math.Sin(camera.direction.X - (90 / (180 / Math.PI))) * 5);
+            }
+            if (keys[68])
+            {
+                camera.pos.X += Convert.ToSingle(Math.Cos(camera.direction.X + (90 / (180 / Math.PI))) * 5);
+                camera.pos.Z += Convert.ToSingle(Math.Sin(camera.direction.X + (90 / (180 / Math.PI))) * 5);
+            }
+            if (keys[83])
+            {
+                camera.pos.X -= Convert.ToSingle(Math.Cos(camera.direction.X) * 5);
+                camera.pos.Z -= Convert.ToSingle(Math.Sin(camera.direction.X) * 5);
+            }
+            if (keys[37])
+            {
+                camera.direction.X += Convert.ToSingle(2 / (180 / Math.PI));
+            }
+            if (keys[39])
+            {
+                camera.direction.X -= Convert.ToSingle(2 / (180 / Math.PI));
+            }
+            if (keys[38])
+            {
+                camera.direction.Y += Convert.ToSingle(2 / (180 / Math.PI));
+            }
+            if (keys[40])
+            {
+                camera.direction.Y -= Convert.ToSingle(2 / (180 / Math.PI));
+            }
             this.Refresh();
         }
 
@@ -155,11 +192,25 @@ namespace Three_Dimensional_V3
                 foreach (Triangle3 tri in obj.tris)
                 {
                     i += 12;
-                    e.Graphics.FillPolygon(new SolidBrush(Color.FromArgb(i, i, i)), tri.PointsOnScreen(camera, obj, res));
+                    if (tri.ShouldBeOnScreen(camera, obj, res))
+                    {
+                        e.Graphics.FillPolygon(new SolidBrush(Color.FromArgb(i, i, i)), tri.PointsOnScreen(camera, obj, res, i / 12));
+                    }
                     //e.Graphics.DrawPolygon(new Pen(Color.Black, 2), tri.PointsOnScreen(camera, obj, res));
                 }
             }
             e.Graphics.ResetTransform();
+        }
+
+        /** KEYBOARD **/
+        private void MainScreen_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+            keys[e.KeyValue] = true;
+        }
+
+        private void MainScreen_KeyUp(object sender, KeyEventArgs e)
+        {
+            keys[e.KeyValue] = false;
         }
     }
 }
