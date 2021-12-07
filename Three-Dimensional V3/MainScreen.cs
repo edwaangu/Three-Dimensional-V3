@@ -27,6 +27,10 @@ namespace Three_Dimensional_V3
          * 
          * -- VERSION HISTORY --
          * 
+         * Version v3.1:
+         * - I don't know at this point
+         * - Rotation XZ works, rotation Y does not work
+         * 
          * Version v3.0.0:
          * ~ Very basic WORKING 3d stuff for once!
          * ~ Basic layering
@@ -38,7 +42,7 @@ namespace Three_Dimensional_V3
         PointF res; // Resolution
 
         /** CAMERA RELATED VARIABLES **/
-        Camera camera = new Camera(60, new Point3(0, 0, 0), new PointF(0, 0)); // Camera
+        Camera camera = new Camera(70, new Point3(0, 0, 0), new PointF(Convert.ToSingle(180 / (180 / Math.PI)), 0)); // Camera
         bool[] keys = new bool[256];
 
 
@@ -143,23 +147,31 @@ namespace Three_Dimensional_V3
         {
             if (keys[87])
             {
-                camera.pos.X += Convert.ToSingle(Math.Cos(camera.direction.X) * 5);
-                camera.pos.Z += Convert.ToSingle(Math.Sin(camera.direction.X) * 5);
+                camera.pos.X -= Convert.ToSingle(Math.Sin(camera.direction.X) * 5);
+                camera.pos.Z -= Convert.ToSingle(Math.Cos(camera.direction.X) * 5);
             }
             if (keys[65])
             {
-                camera.pos.X += Convert.ToSingle(Math.Cos(camera.direction.X - (90 / (180 / Math.PI))) * 5);
-                camera.pos.Z += Convert.ToSingle(Math.Sin(camera.direction.X - (90 / (180 / Math.PI))) * 5);
+                camera.pos.X -= Convert.ToSingle(Math.Sin(camera.direction.X - (90 / (180 / Math.PI))) * 5);
+                camera.pos.Z -= Convert.ToSingle(Math.Cos(camera.direction.X - (90 / (180 / Math.PI))) * 5);
             }
             if (keys[68])
             {
-                camera.pos.X += Convert.ToSingle(Math.Cos(camera.direction.X + (90 / (180 / Math.PI))) * 5);
-                camera.pos.Z += Convert.ToSingle(Math.Sin(camera.direction.X + (90 / (180 / Math.PI))) * 5);
+                camera.pos.X -= Convert.ToSingle(Math.Sin(camera.direction.X + (90 / (180 / Math.PI))) * 5);
+                camera.pos.Z -= Convert.ToSingle(Math.Cos(camera.direction.X + (90 / (180 / Math.PI))) * 5);
             }
             if (keys[83])
             {
-                camera.pos.X -= Convert.ToSingle(Math.Cos(camera.direction.X) * 5);
-                camera.pos.Z -= Convert.ToSingle(Math.Sin(camera.direction.X) * 5);
+                camera.pos.X += Convert.ToSingle(Math.Sin(camera.direction.X) * 5);
+                camera.pos.Z += Convert.ToSingle(Math.Cos(camera.direction.X) * 5);
+            }
+            if (keys[16])
+            {
+                camera.pos.Y -= 5;
+            }
+            if (keys[32])
+            {
+                camera.pos.Y += 5;
             }
             if (keys[37])
             {

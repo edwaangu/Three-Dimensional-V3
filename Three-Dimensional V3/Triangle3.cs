@@ -48,11 +48,11 @@ namespace Three_Dimensional_V3
                 oldPoints[i].Z -= _cam.pos.Z;
 
                 float distXZ = Convert.ToSingle(Math.Sqrt(Math.Pow(oldPoints[i].X, 2) + Math.Pow(oldPoints[i].Z, 2)));
-                float dirXZ = Convert.ToSingle(Math.Atan2(oldPoints[i].Z - _cam.pos.Z, oldPoints[i].X - _cam.pos.X));
+                float dirXZ = Convert.ToSingle(Math.Atan2(0 - oldPoints[i].X, 0 - oldPoints[i].Z));
                 float distXYZ = Convert.ToSingle(Math.Sqrt(Math.Pow(distXZ, 2) + Math.Pow(oldPoints[i].Y, 2)));
-                float dirY = Convert.ToSingle(Math.Atan2(oldPoints[i].Y - _cam.pos.Y, dirXZ));
-                oldPoints[i].X = Convert.ToSingle(Math.Cos(dirXZ - _cam.direction.X) * distXZ);
-                oldPoints[i].Z = Convert.ToSingle(Math.Sin(dirXZ - _cam.direction.X) * distXZ);
+                float dirY = Convert.ToSingle(Math.Atan2(distXZ, 0 - oldPoints[i].Y));
+                oldPoints[i].X = Convert.ToSingle(Math.Sin(dirXZ - _cam.direction.X) * distXZ);
+                oldPoints[i].Z = Convert.ToSingle(Math.Cos(dirXZ - _cam.direction.X) * distXZ);
                 oldPoints[i].Y = Convert.ToSingle(Math.Sin(dirY - _cam.direction.Y) * distXYZ);
             }
             
