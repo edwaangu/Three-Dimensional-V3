@@ -206,7 +206,7 @@ namespace Three_Dimensional_V3
                     i += 12;
                     if (tri.ShouldBeOnScreen(camera, obj, res))
                     {
-                        e.Graphics.FillPolygon(new SolidBrush(Color.FromArgb(i, i, i)), tri.PointsOnScreen(camera, obj, res, i / 12));
+                        e.Graphics.DrawPolygon(new Pen(Color.FromArgb(i, i, i), 3), tri.PointsOnScreen(camera, obj, res, i / 12));
                     }
                     //e.Graphics.DrawPolygon(new Pen(Color.Black, 2), tri.PointsOnScreen(camera, obj, res));
                 }
