@@ -12,11 +12,13 @@ namespace Three_Dimensional_V3
         public float fov;
         public Point3 pos;
         public PointF direction;
-        public Camera(float _fov, Point3 _pos, PointF _direction)
+        public float maximumRenderDistance;
+        public Camera(float _fov, Point3 _pos, PointF _direction, float _maximumRenderDistance)
         {
             fov = _fov;
             pos = _pos;
             direction = _direction;
+            maximumRenderDistance = _maximumRenderDistance;
         }
     }
 }

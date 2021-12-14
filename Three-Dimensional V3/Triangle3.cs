@@ -98,6 +98,7 @@ namespace Three_Dimensional_V3
                 float theZ = oldPoints[i].Z - Z0;
                 float theX = oldPoints[i].X * (Z0 / (Z0 + theZ));
                 float theY = oldPoints[i].Y * (Z0 / (Z0 + theZ));
+
                 if (theX > 10000)
                 {
                     theX = 10000;
@@ -114,10 +115,10 @@ namespace Three_Dimensional_V3
                 {
                     theY = -10000;
                 }
-                Console.WriteLine($"Z of point {i} is {oldPoints[i].Z}");
+                //Console.WriteLine($"Z of point {i} is {oldPoints[i].Z}");
                 if (oldPoints[i].Z > 0)
                 {
-                    if (theX > -_resolution.X / 2 && theX < _resolution.X / 2 && theY > -_resolution.Y / 2 && theY < _resolution.Y / 2)
+                    if (theX > -_resolution.X / 2 && theX < _resolution.X / 2 && theY > -_resolution.Y / 2 && theY < _resolution.Y / 2 && Math.Sqrt((Math.Pow(oldPoints[i].X, 2) + Math.Pow(oldPoints[i].Y, 2) + Math.Pow(oldPoints[i].Z, 2))) < _cam.maximumRenderDistance)
                     {
                         return true;
                     }
@@ -161,10 +162,10 @@ namespace Three_Dimensional_V3
                 }
                 thePoints[i].X = theX;
                 thePoints[i].Y = theY;
-                saidZ += Convert.ToSingle(Math.Sqrt(Math.Pow(points[i].X + _obj.pos.X - _cam.pos.X, 2) + Math.Pow(points[i].Y + _obj.pos.Y - _cam.pos.Y, 2) + Math.Pow(points[i].Z + _obj.pos.Z - _cam.pos.Z, 2)));
+                saidZ += Convert.ToSingle(Math.Sqrt(Math.Pow(oldPoints[i].X, 2) + Math.Pow(oldPoints[i].Y, 2) + Math.Pow(oldPoints[i].Z, 2)));
             }
-            saidZ /= 3;
-            Console.WriteLine($"saidZ of tri {thenum} is {saidZ}");
+            //saidZ /= 3;
+            //Console.WriteLine($"saidZ of tri {thenum} is {saidZ}");
 
             return thePoints;
         }
