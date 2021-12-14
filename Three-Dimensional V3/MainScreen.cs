@@ -174,7 +174,7 @@ namespace Three_Dimensional_V3
             if (keys[16])
             {
                 camera.pos.Y += 5;
-            }.
+            }
             if (keys[32])
             {
                 camera.pos.Y -= 5;
