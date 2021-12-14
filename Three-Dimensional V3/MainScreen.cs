@@ -174,26 +174,26 @@ namespace Three_Dimensional_V3
             if (keys[16])
             {
                 camera.pos.Y += 5;
-            }
+            }.
             if (keys[32])
             {
                 camera.pos.Y -= 5;
             }
             if (keys[37])
             {
-                camera.direction.X += Convert.ToSingle(2 / (180 / Math.PI));
+                camera.direction.X += Convert.ToSingle(1 / (180 / Math.PI));
             }
             if (keys[39])
             {
-                camera.direction.X -= Convert.ToSingle(2 / (180 / Math.PI));
+                camera.direction.X -= Convert.ToSingle(1 / (180 / Math.PI));
             }
             if (keys[38])
             {
-                camera.direction.Y += Convert.ToSingle(2 / (180 / Math.PI));
+                camera.direction.Y += Convert.ToSingle(1 / (180 / Math.PI));
             }
             if (keys[40])
             {
-                camera.direction.Y -= Convert.ToSingle(2 / (180 / Math.PI));
+                camera.direction.Y -= Convert.ToSingle(1 / (180 / Math.PI));
             }
             this.Refresh();
         }
