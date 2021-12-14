@@ -48,7 +48,7 @@ namespace Three_Dimensional_V3
         PointF res; // Resolution
 
         /** CAMERA RELATED VARIABLES **/
-        Camera camera = new Camera(70, new Point3(0, 0, 0), new PointF(Convert.ToSingle(180 / (180 / Math.PI)), 0)); // Camera
+        Camera camera = new Camera(70, new Point3(0, 0, 0), new PointF(0, 0)); // Camera
         bool[] keys = new bool[256];
 
 
