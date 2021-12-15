@@ -147,6 +147,8 @@ namespace Three_Dimensional_V3
             {
                 for(float j = 0;j < 360;j += 360 / (columns))
                 {
+                    float tempRadius = radius + randGen.Next(-15, 15);
+
                     float columnAdder = (360 / columns) / rad2Deg;
                     float rowAdder = (180 / rows) / rad2Deg;
                     float dirHorizontal = j / rad2Deg;
@@ -195,7 +197,10 @@ namespace Three_Dimensional_V3
         {
             InitializeComponent();
 
-            Sphere(new Point3(0, 0, 600), 300, 50, 50);
+            //for (int i = 0; i < 20; i++)
+            //{
+                Sphere(new Point3(0, 0, 1000), 100, 30, 60);
+            //}
             /*for(int i = 0;i < 200;i++)
             {
                 objs.Add(new Object(new List<Triangle3>() {
@@ -278,7 +283,7 @@ namespace Three_Dimensional_V3
             {
                 foreach (Triangle3 tri in obj.tris)
                 {
-                    tri.PointsOnScreen(camera, obj, res, 0);
+                    tri.PointsOnScreen(camera, obj, res);
                 }
             }
 
@@ -350,11 +355,12 @@ namespace Three_Dimensional_V3
         private void MainScreen_Paint(object sender, PaintEventArgs e)
         {
             e.Graphics.TranslateTransform(res.X / 2, res.Y / 2);
-            float i = 0;
 
             List<SortingTriangle3> trisToSort = new List<SortingTriangle3>();
+            List<float> objInts = new List<float>();
             foreach(Object obj in objs)
             {
+                objInts.Add(0);
                 foreach(Triangle3 tri in obj.tris)
                 {
                     trisToSort.Add(new SortingTriangle3(tri, obj));
@@ -369,8 +375,10 @@ namespace Three_Dimensional_V3
 
                 if (tri.tri.ShouldBeOnScreen(camera, tri.obj, res))
                 {
-                    i += 0.05f;
-                    e.Graphics.FillPolygon(new SolidBrush(Color.FromArgb(Convert.ToInt16(i / 2), Convert.ToInt16(i / 20), Convert.ToInt16(i))), tri.tri.PointsOnScreen(camera, tri.obj, res, i / 12));
+                     // Color.FromArgb(Convert.ToInt16(i / 2), Convert.ToInt16(i / 20), Convert.ToInt16(i)))
+                    e.Graphics.FillPolygon(new SolidBrush(Color.FromArgb(Convert.ToInt16(objInts[tri.obj.id] / 2), Convert.ToInt16(objInts[tri.obj.id] / 10), Convert.ToInt16(objInts[tri.obj.id]))), tri.tri.PointsOnScreen(camera, tri.obj, res));
+                    objInts[tri.obj.id] += 0.06f;
+                    //e.Graphics.DrawPolygon(new Pen(Color.Black, 2), tri.tri.PointsOnScreen(camera, tri.obj, res, i / 12));
                 }
             }
 

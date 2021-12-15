@@ -127,7 +127,7 @@ namespace Three_Dimensional_V3
             return false;
         }
 
-        public PointF[] PointsOnScreen(Camera _cam, Object _obj, PointF _resolution, float thenum)
+        public PointF[] PointsOnScreen(Camera _cam, Object _obj, PointF _resolution)
         {
             PointF[] thePoints = new PointF[3];
 

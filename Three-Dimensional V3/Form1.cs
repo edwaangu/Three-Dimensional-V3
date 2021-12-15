@@ -12,6 +12,7 @@ namespace Three_Dimensional_V3
 {
     public partial class Form1 : Form
     {
+        public static int maxid = 0;
         public Form1()
         {
             InitializeComponent();
