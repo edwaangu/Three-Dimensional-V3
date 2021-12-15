@@ -15,20 +15,29 @@ namespace Three_Dimensional_V3
         /**
          * -- Three-Dimensional V3 -- 
          * Made by Ted Angus
-         * Created: 2021/11/29 - 2021/11/30
+         * Created: 2021/11/29 - 2021/12/15
          * 
          * -- TO DO --
-         * ~ Proper Z-Layering
-         * ~ Object rotations
-         * ~ Camera movement
-         * ~ Camera rotation
+         * ~ Hide shapes that aren't visible to the camera (Because other shapes may be covering it)
+         * ~ Proper Z-Layering 
+         * ~ [PRIORITY] Object rotations
          * ~ Completely in function
-         * ~ Usability in other programs
+         * ~ Convert this program to a reference
+         * ~ [PRIORITY] Add more options for shapes (Cylinders, Pyramids, Rectangular prisms, Planes, 2D Shapes in 3D, etc.)
+         * ~ [PRIORITY] Turn the cube into a function so it's adjustable
+         * 
+         * -- BUGS --
+         * ~ [PRIORITY] Triangle disappears with all points off screen even though a line still crosses the screen
+         * ~ Triangle covers entire screen when right behind camera
+         * ~ Horrible issues at higher FOVS (Probably will never fix)
          * 
          * -- VERSION HISTORY --
+         * Version v3.3:
+         * - Spheres
+         * - Fixed "Triangles may flash when appearing for one frame before being sorted with the rest"
          * 
          * Version v3.2:
-         * - Hell yeah I did the Y rotations
+         * - Y axis Rotations completed
          * - All rotations work now
          * - Stable for once
          * - Layering issues may still exist though unfortunately
@@ -199,9 +208,9 @@ namespace Three_Dimensional_V3
 
             //for (int i = 0; i < 20; i++)
             //{
-                Sphere(new Point3(0, 0, 1000), 100, 30, 60);
+            //    Sphere(new Point3(randGen.Next(-1500, 1500), randGen.Next(-500, 500), randGen.Next(1500, 4000)), randGen.Next(50, 300), 6, 12);
             //}
-            /*for(int i = 0;i < 200;i++)
+            for(int i = 0;i < 200;i++)
             {
                 objs.Add(new Object(new List<Triangle3>() {
                 // Front
@@ -276,7 +285,7 @@ namespace Three_Dimensional_V3
                     new Point3(50, 50, -50),
                 }),
             }, new Point3(randGen.Next(-1500, 1500), randGen.Next(-500, 500), randGen.Next(-1500, 1500)), new Point3(0, 0, 0)));
-            }*/
+            }
             res = new PointF(this.Width, this.Height); // 800, 450
 
             foreach (Object obj in objs)
@@ -360,44 +369,31 @@ namespace Three_Dimensional_V3
             List<float> objInts = new List<float>();
             foreach(Object obj in objs)
             {
-                objInts.Add(0);
-                foreach(Triangle3 tri in obj.tris)
+                objInts.Add(0); 
+                foreach (Triangle3 tri in obj.tris)
                 {
                     trisToSort.Add(new SortingTriangle3(tri, obj));
                 }
             }
 
+
+            foreach (SortingTriangle3 tri in trisToSort)
+            {
+                tri.tri.setupLayering(camera, tri.obj, res);
+            }
             trisToSort = trisToSort.OrderByDescending(x => x.tri.saidZ).ToList();
 
             foreach (SortingTriangle3 tri in trisToSort)
             {
-                //sorttri.obj.tris = sorttri.obj.tris.OrderByDescending(x => x.saidZ).ToList();
 
                 if (tri.tri.ShouldBeOnScreen(camera, tri.obj, res))
                 {
-                     // Color.FromArgb(Convert.ToInt16(i / 2), Convert.ToInt16(i / 20), Convert.ToInt16(i)))
+                    // Color.FromArgb(Convert.ToInt16(i / 2), Convert.ToInt16(i / 20), Convert.ToInt16(i)))
                     e.Graphics.FillPolygon(new SolidBrush(Color.FromArgb(Convert.ToInt16(objInts[tri.obj.id] / 2), Convert.ToInt16(objInts[tri.obj.id] / 10), Convert.ToInt16(objInts[tri.obj.id]))), tri.tri.PointsOnScreen(camera, tri.obj, res));
-                    objInts[tri.obj.id] += 0.06f;
+                    objInts[tri.obj.id] += 255 / tri.obj.tris.Count;
                     //e.Graphics.DrawPolygon(new Pen(Color.Black, 2), tri.tri.PointsOnScreen(camera, tri.obj, res, i / 12));
                 }
             }
-
-            /*
-            foreach(Object obj in objs)
-            {
-                obj.tris = obj.tris.OrderByDescending(x => x.saidZ).ToList();
-                i = 0;
-                foreach (Triangle3 tri in obj.tris)
-                {
-                    i += 12;
-                    if (tri.ShouldBeOnScreen(camera, obj, res))
-                    {
-                        e.Graphics.FillPolygon(new SolidBrush(Color.FromArgb(i, i, i)), tri.PointsOnScreen(camera, obj, res, i / 12));
-                    }
-                    //e.Graphics.DrawPolygon(new Pen(Color.Black, 2), tri.PointsOnScreen(camera, obj, res));
-                }
-            }
-            */
             e.Graphics.ResetTransform();
 
             e.Graphics.DrawString($"FPS: {fps}", DefaultFont, new SolidBrush(Color.Black), new PointF(10, 10));

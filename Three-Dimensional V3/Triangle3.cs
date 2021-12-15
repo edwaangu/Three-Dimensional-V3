@@ -68,19 +68,24 @@ namespace Three_Dimensional_V3
 
                 oldPoints[i].Y = Convert.ToSingle((oldY * Math.Cos(theta)) - (oldZ * Math.Sin(theta)));
                 oldPoints[i].Z = Convert.ToSingle((oldZ * Math.Cos(theta)) + (oldY * Math.Sin(theta)));
-
-
-                /*
-                float distXZ = Convert.ToSingle(Math.Sqrt(Math.Pow(oldPoints[i].X, 2) + Math.Pow(oldPoints[i].Z, 2)));
-                float dirXZ = Convert.ToSingle(Math.Atan2(0 - oldPoints[i].X, 0 - oldPoints[i].Z));
-                float distYZ = Convert.ToSingle(Math.Sqrt(Math.Pow(oldPoints[i].Y, 2) + Math.Pow(oldPoints[i].Z, 2)));
-                float distXYZ = Convert.ToSingle(Math.Sqrt(Math.Pow(distXZ, 2) + Math.Pow(oldPoints[i].Y, 2)));
-                float dirY = Convert.ToSingle(Math.Atan2(0 - oldPoints[i].Y, 0 - oldPoints[i].Z));
-                oldPoints[i].X = Convert.ToSingle(Math.Sin(dirXZ - _cam.direction.X) * distXZ);
-                oldPoints[i].Z = Convert.ToSingle(Math.Cos(dirXZ - _cam.direction.X) * distXZ);
-                oldPoints[i].Y = Convert.ToSingle(Math.Sin(dirY - _cam.direction.Y) * distYZ);
-                */
             }
+        }
+
+        public void setupLayering(Camera _cam, Object _obj, PointF _resolution)
+        {
+            TrianglePointsReset();
+            TranslateByObject(_obj);
+            TranslateByCamera(_cam);
+
+            float toRad = Convert.ToSingle(180 / Math.PI);
+            float Z0 = Convert.ToSingle((_resolution.X / 2) / Math.Tan((_cam.fov / 2) / toRad));
+            saidZ = 0;
+            for (int i = 0; i < oldPoints.Length; i++)
+            {
+                saidZ += Convert.ToSingle(Math.Sqrt(Math.Pow(oldPoints[i].X, 2) + Math.Pow(oldPoints[i].Y, 2) + Math.Pow(oldPoints[i].Z, 2)));
+                //saidZ += Convert.ToSingle(Math.Sqrt(Math.Pow(oldPoints[i].Z, 2) + Math.Pow(oldPoints[i].X, 2)));
+            }
+            saidZ /= 3;
         }
         
         public bool ShouldBeOnScreen(Camera _cam, Object _obj, PointF _resolution)
@@ -99,26 +104,26 @@ namespace Three_Dimensional_V3
                 float theX = oldPoints[i].X * (Z0 / (Z0 + theZ));
                 float theY = oldPoints[i].Y * (Z0 / (Z0 + theZ));
 
-                if (theX > 10000)
+                if (theX > 30000)
                 {
-                    theX = 10000;
+                    theX = 30000;
                 }
-                if (theX < -10000)
+                if (theX < -30000)
                 {
-                    theX = -10000;
+                    theX = -30000;
                 }
-                if (theY > 10000)
+                if (theY > 30000)
                 {
-                    theY = 10000;
+                    theY = 30000;
                 }
-                if (theY < -10000)
+                if (theY < -30000)
                 {
-                    theY = -10000;
+                    theY = -30000;
                 }
                 //Console.WriteLine($"Z of point {i} is {oldPoints[i].Z}");
                 if (oldPoints[i].Z > 0)
                 {
-                    if (theX > -_resolution.X / 2 && theX < _resolution.X / 2 && theY > -_resolution.Y / 2 && theY < _resolution.Y / 2 && Math.Sqrt((Math.Pow(oldPoints[i].X, 2) + Math.Pow(oldPoints[i].Y, 2) + Math.Pow(oldPoints[i].Z, 2))) < _cam.maximumRenderDistance)
+                    if (theX > -_resolution.X / 1.9 && theX < _resolution.X / 1.9 && theY > -_resolution.Y / 1.9 && theY < _resolution.Y / 1.9 && Math.Sqrt((Math.Pow(oldPoints[i].X, 2) + Math.Pow(oldPoints[i].Y, 2) + Math.Pow(oldPoints[i].Z, 2))) < _cam.maximumRenderDistance)
                     {
                         return true;
                     }
@@ -144,27 +149,27 @@ namespace Three_Dimensional_V3
                 float theZ = oldPoints[i].Z - Z0;
                 float theX = oldPoints[i].X * (Z0 / (Z0 + theZ));
                 float theY = oldPoints[i].Y * (Z0 / (Z0 + theZ));
-                if(theX > 10000)
+                if(theX > 30000)
                 {
-                    theX = 10000;
+                    theX = 30000;
                 }
-                if(theX < -10000)
+                if(theX < -30000)
                 {
-                    theX = -10000;
+                    theX = -30000;
                 }
-                if (theY > 10000)
+                if (theY > 30000)
                 {
-                    theY = 10000;
+                    theY = 30000;
                 }
-                if (theY < -10000)
+                if (theY < -30000)
                 {
-                    theY = -10000;
+                    theY = -30000;
                 }
                 thePoints[i].X = theX;
                 thePoints[i].Y = theY;
                 saidZ += Convert.ToSingle(Math.Sqrt(Math.Pow(oldPoints[i].X, 2) + Math.Pow(oldPoints[i].Y, 2) + Math.Pow(oldPoints[i].Z, 2)));
             }
-            //saidZ /= 3;
+            saidZ /= 3;
             //Console.WriteLine($"saidZ of tri {thenum} is {saidZ}");
 
             return thePoints;
