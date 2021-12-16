@@ -8,7 +8,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
-using Obstacle;
 
 namespace Three_Dimensional_V3
 {
@@ -60,7 +59,7 @@ namespace Three_Dimensional_V3
         Random randGen = new Random();
 
         /** CAMERA RELATED VARIABLES **/
-        Camera camera = new Camera(70, new Point3(0, 0, 0), new PointF(0, 0), 2000); // Camera
+        Camera camera = new Camera(70, new Point3(0, 0, 0), new PointF(0, 0), 4000); // Camera
         bool[] keys = new bool[256];
 
         /** FPS RELATED VARIABLES **/
@@ -72,102 +71,36 @@ namespace Three_Dimensional_V3
 
 
         /** SHAPE RELATED VARIABLES **/
-        List<Object> objs = new List<Object>(){ 
-            /*new Object(new List<Triangle3>() {
-                // Front
-                new Triangle3( new Point3[] {
-                    new Point3(-50, -50, -50),
-                    new Point3(-50, 50, -50),
-                    new Point3(50, -50, -50),
-                }),
-                new Triangle3( new Point3[] {
-                    new Point3(50, 50, -50),
-                    new Point3(-50, 50, -50),
-                    new Point3(50, -50, -50),
-                }),
-                // Right Side
-                
-                new Triangle3( new Point3[] {
-                    new Point3(50, -50, -50),
-                    new Point3(50, 50, -50),
-                    new Point3(50, -50, 50),
-                }),
-                new Triangle3( new Point3[] {
-                    new Point3(50, 50, 50),
-                    new Point3(50, 50, -50),
-                    new Point3(50, -50, 50),
-                }),
+        List<Object> objs = new List<Object>();
 
-                // Left Side
-                new Triangle3( new Point3[] {
-                    new Point3(-50, -50, -50),
-                    new Point3(-50, 50, -50),
-                    new Point3(-50, -50, 50),
-                }),
-                new Triangle3( new Point3[] {
-                    new Point3(-50, 50, 50),
-                    new Point3(-50, 50, -50),
-                    new Point3(-50, -50, 50),
-                }),
-
-                // Back Side
-                new Triangle3( new Point3[] {
-                    new Point3(-50, -50, 50),
-                    new Point3(-50, 50, 50),
-                    new Point3(50, -50, 50),
-                }),
-                new Triangle3( new Point3[] {
-                    new Point3(50, 50, 50),
-                    new Point3(-50, 50, 50),
-                    new Point3(50, -50, 50),
-                }),
-
-                // Top Side
-                new Triangle3( new Point3[] {
-                    new Point3(-50, -50, -50),
-                    new Point3(-50, -50, 50),
-                    new Point3(50, -50, -50),
-                }),
-                new Triangle3( new Point3[] {
-                    new Point3(50, -50, 50),
-                    new Point3(-50, -50, 50),
-                    new Point3(50, -50, -50),
-                }),
-                
-                // Bottom Side
-                new Triangle3( new Point3[] {
-                    new Point3(-50, 50, -50),
-                    new Point3(-50, 50, 50),
-                    new Point3(50, 50, -50),
-                }),
-                new Triangle3( new Point3[] {
-                    new Point3(50, 50, 50),
-                    new Point3(-50, 50, 50),
-                    new Point3(50, 50, -50),
-                }),
-            }, new Point3(0, 0, 600), new Point3(0, 0, 0))*/
-        };
-
-        /** SPHERE MAKER **/
+        /** SHAPE MAKERS **/
         void newSphere(Point3 location, float radius, float rows, float columns)
         {
+            // Create a list of triangles to update
             List<Triangle3> tempTris = new List<Triangle3>();
+
+            // Get the conversion from radians to degrees
             float rad2Deg = Convert.ToSingle(180 / Math.PI);
 
+            // A for loop that starts from the bottom to the top of the sphere, increasing by 180 over the amount of rows
             for(float i = -90;i < 90;i +=180 / rows)
             {
+                // A for loop that starts and loops around back to the start, increasing by 360 over the amount of columns
                 for(float j = 0;j < 360;j += 360 / (columns))
                 {
-                    float tempRadius = radius + randGen.Next(-15, 15);
-
+                    // Get the column adder and row adder into variables for simplicity
                     float columnAdder = (360 / columns) / rad2Deg;
                     float rowAdder = (180 / rows) / rad2Deg;
+
+                    // Find the current degree in the horizontal and vertical directions
                     float dirHorizontal = j / rad2Deg;
                     float dirVertical = i / rad2Deg;
+
+                    // Create two new triangles (Assuming 0 is min and 1 is max (up and right is positive): One is (0, 0) (0, 1) (1, 0), and the second is (1, 1) (0, 1) (1, 0)
                     Triangle3 tempTri = new Triangle3(new Point3[] { 
                         new Point3(
-                            Convert.ToSingle(Math.Cos(dirHorizontal) * radius * Math.Cos(dirVertical)), 
-                            Convert.ToSingle(Math.Sin(dirVertical) * radius), 
+                            Convert.ToSingle(Math.Cos(dirHorizontal) * radius * Math.Cos(dirVertical)), // Multiply the horizontal Sine by radius and the Cosine of the vertical
+                            Convert.ToSingle(Math.Sin(dirVertical) * radius), // Multiply the Vertical by the radius only
                             Convert.ToSingle(Math.Sin(dirHorizontal) * radius * Math.Cos(dirVertical))),
                         new Point3(
                             Convert.ToSingle(Math.Cos(dirHorizontal) * radius * Math.Cos(dirVertical + rowAdder)), 
@@ -198,11 +131,14 @@ namespace Three_Dimensional_V3
                 }
             }
 
+            // Create the object
             objs.Add(new Object(tempTris, location, new Point3(0, 0, 0)));
         }
          
+
         void newCube(Point3 location, Point3 size)
         {
+            // Create 12 triangles, 2 for each side
             objs.Add(new Object(new List<Triangle3>() {
                 // Front
                 new Triangle3( new Point3[] {
@@ -281,88 +217,17 @@ namespace Three_Dimensional_V3
         /** INIT METHOD **/
         public MainScreen()
         {
+            // Initialize
             InitializeComponent();
 
-            //for (int i = 0; i < 20; i++)
-            //{
-            //    Sphere(new Point3(randGen.Next(-1500, 1500), randGen.Next(-500, 500), randGen.Next(1500, 4000)), randGen.Next(50, 300), 6, 12);
-            //}
-            for(int i = 0;i < 34;i++)
+            // Add spheres
+            for (int i = 0; i < 20; i++)
+            {
+                newSphere(new Point3(randGen.Next(-1500, 1500), randGen.Next(-500, 500), randGen.Next(500, 6000)), randGen.Next(50, 300), 6, 12);
+            }
+            for (int i = 0;i < 12;i++)
             {
                 newCube(new Point3(randGen.Next(-1500, 1500), randGen.Next(-500, 500), randGen.Next(500, 6000)), new Point3(randGen.Next(50, 300), randGen.Next(50, 300), randGen.Next(50, 300)));
-            //    objs.Add(new Object(new List<Triangle3>() {
-            //    // Front
-            //    new Triangle3( new Point3[] {
-            //        new Point3(-50, -50, -50),
-            //        new Point3(-50, 50, -50),
-            //        new Point3(50, -50, -50),
-            //    }),
-            //    new Triangle3( new Point3[] {
-            //        new Point3(50, 50, -50),
-            //        new Point3(-50, 50, -50),
-            //        new Point3(50, -50, -50),
-            //    }),
-            //    // Right Side
-                
-            //    new Triangle3( new Point3[] {
-            //        new Point3(50, -50, -50),
-            //        new Point3(50, 50, -50),
-            //        new Point3(50, -50, 50),
-            //    }),
-            //    new Triangle3( new Point3[] {
-            //        new Point3(50, 50, 50),
-            //        new Point3(50, 50, -50),
-            //        new Point3(50, -50, 50),
-            //    }),
-
-            //    // Left Side
-            //    new Triangle3( new Point3[] {
-            //        new Point3(-50, -50, -50),
-            //        new Point3(-50, 50, -50),
-            //        new Point3(-50, -50, 50),
-            //    }),
-            //    new Triangle3( new Point3[] {
-            //        new Point3(-50, 50, 50),
-            //        new Point3(-50, 50, -50),
-            //        new Point3(-50, -50, 50),
-            //    }),
-
-            //    // Back Side
-            //    new Triangle3( new Point3[] {
-            //        new Point3(-50, -50, 50),
-            //        new Point3(-50, 50, 50),
-            //        new Point3(50, -50, 50),
-            //    }),
-            //    new Triangle3( new Point3[] {
-            //        new Point3(50, 50, 50),
-            //        new Point3(-50, 50, 50),
-            //        new Point3(50, -50, 50),
-            //    }),
-
-            //    // Top Side
-            //    new Triangle3( new Point3[] {
-            //        new Point3(-50, -50, -50),
-            //        new Point3(-50, -50, 50),
-            //        new Point3(50, -50, -50),
-            //    }),
-            //    new Triangle3( new Point3[] {
-            //        new Point3(50, -50, 50),
-            //        new Point3(-50, -50, 50),
-            //        new Point3(50, -50, -50),
-            //    }),
-                
-            //    // Bottom Side
-            //    new Triangle3( new Point3[] {
-            //        new Point3(-50, 50, -50),
-            //        new Point3(-50, 50, 50),
-            //        new Point3(50, 50, -50),
-            //    }),
-            //    new Triangle3( new Point3[] {
-            //        new Point3(50, 50, 50),
-            //        new Point3(-50, 50, 50),
-            //        new Point3(50, 50, -50),
-            //    }),
-            //}, new Point3((i%7)*100, Convert.ToSingle(Math.Floor(Convert.ToDecimal((i / 7)%7)) * 100), Convert.ToSingle(Math.Floor(Convert.ToDecimal((i /49)) * 100))), new Point3(0, 0, 0)));
             }
             res = new PointF(this.Width, this.Height); // 800, 450
 
@@ -462,6 +327,36 @@ namespace Three_Dimensional_V3
                 tri.tri.setupLayering(camera, tri.obj, res);
             }
             trisToSort = trisToSort.OrderByDescending(x => x.tri.saidZ).ToList();
+
+            // Decide to show or hide the triangles
+            /*
+            GraphicsPath gp = new GraphicsPath();
+            for(int i = trisToSort.Count - 1;i >= 0; i--)
+            {
+                PointF[] tempPoints = trisToSort[i].tri.PointsOnScreen(camera, trisToSort[i].obj, res); 
+                if (trisToSort[i].tri.ShouldBeOnScreen(camera, trisToSort[i].obj, res) == false)
+                {
+                    trisToSort[i].needsToDraw = false;
+                }
+                if (trisToSort[i].needsToDraw == true)
+                {
+                    if (gp.IsVisible(tempPoints[0]))
+                    {
+                        if (gp.IsVisible(tempPoints[1]))
+                        {
+                            if (gp.IsVisible(tempPoints[2]))
+                            {
+                                trisToSort[i].needsToDraw = false;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        gp.AddPolygon(tempPoints);
+                    }
+                }
+            }
+            gp.Dispose();*/
 
 
             // Draw the triangles
