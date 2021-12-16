@@ -24,7 +24,7 @@ namespace Three_Dimensional_V3
          * ~ [PRIORITY] Object rotations
          * ~ Completely in function
          * ~ Convert this program to a reference
-         * ~ [PRIORITY] Add more options for shapes (Cylinders, Pyramids, Rectangular prisms, Planes, 2D Shapes in 3D, etc.)
+         * ~ [PRIORITY] Add more options for shapes (Cones, Pyramids, Planes, 2D Shapes in 3D, etc.)
          * ~ [PRIORITY] Turn the cube into a function so it's adjustable
          * 
          * -- BUGS --
@@ -33,6 +33,11 @@ namespace Three_Dimensional_V3
          * ~ Horrible issues at higher FOVS (Probably will never fix)
          * 
          * -- VERSION HISTORY --
+         * 
+         * Version v3.4"
+         * - Designated Cube Function
+         * - Cylinders!
+         * 
          * Version v3.3:
          * - Spheres
          * - Fixed "Triangles may flash when appearing for one frame before being sorted with the rest"
@@ -134,9 +139,8 @@ namespace Three_Dimensional_V3
             // Create the object
             objs.Add(new Object(tempTris, location, new Point3(0, 0, 0)));
         }
-         
 
-        void newCube(Point3 location, Point3 size)
+        void newCube(Point3 location, Point3 size, Point3 rotation)
         {
             // Create 12 triangles, 2 for each side
             objs.Add(new Object(new List<Triangle3>() {
@@ -211,7 +215,54 @@ namespace Three_Dimensional_V3
                     new Point3(-size.X, size.Y, size.Z),
                     new Point3(size.X, size.Y, -size.Z),
                 }),
-            }, location, new Point3(0, 0, 0)));
+            }, location, rotation));
+        }
+
+        void newCylinder(Point3 location, float radius, float height, float columns, Point3 rotation)
+        {
+            // Create a list of temp triangles
+            List<Triangle3> tempTris = new List<Triangle3>();
+
+            // Conversion
+            float rad2Deg = Convert.ToSingle(180 / Math.PI);
+
+            // A for loop for everycolumn
+            for (float i = 0;i < 360;i +=360 / columns)
+            {
+                float columnAdder = 360 / columns;
+
+                // Rectangles
+                tempTris.Add(new Triangle3(new Point3[]
+                {
+                    new Point3(Convert.ToSingle(Math.Cos(i / rad2Deg) * radius), -height, Convert.ToSingle(Math.Sin(i / rad2Deg) * radius)),
+                    new Point3(Convert.ToSingle(Math.Cos((i + columnAdder) / rad2Deg) * radius), -height, Convert.ToSingle(Math.Sin((i + columnAdder) / rad2Deg) * radius)),
+                    new Point3(Convert.ToSingle(Math.Cos((i + columnAdder) / rad2Deg) * radius), height, Convert.ToSingle(Math.Sin((i + columnAdder) / rad2Deg) * radius)),
+                }));
+                tempTris.Add(new Triangle3(new Point3[]
+                {
+                    new Point3(Convert.ToSingle(Math.Cos(i / rad2Deg) * radius), height, Convert.ToSingle(Math.Sin(i / rad2Deg) * radius)),
+                    new Point3(Convert.ToSingle(Math.Cos(i / rad2Deg) * radius), -height, Convert.ToSingle(Math.Sin(i / rad2Deg) * radius)),
+                    new Point3(Convert.ToSingle(Math.Cos((i + columnAdder) / rad2Deg) * radius), height, Convert.ToSingle(Math.Sin((i + columnAdder) / rad2Deg) * radius)),
+                }));
+
+                // Top circle
+                tempTris.Add(new Triangle3(new Point3[]
+                {
+                    new Point3(Convert.ToSingle(Math.Cos(i / rad2Deg) * radius), height, Convert.ToSingle(Math.Sin(i / rad2Deg) * radius)),
+                    new Point3(Convert.ToSingle(Math.Cos((i + columnAdder) / rad2Deg) * radius), height, Convert.ToSingle(Math.Sin((i + columnAdder) / rad2Deg) * radius)),
+                    new Point3(0, height, 0),
+                }));
+
+                // Bottom circle
+                tempTris.Add(new Triangle3(new Point3[]
+                {
+                    new Point3(Convert.ToSingle(Math.Cos(i / rad2Deg) * radius), -height, Convert.ToSingle(Math.Sin(i / rad2Deg) * radius)),
+                    new Point3(Convert.ToSingle(Math.Cos((i + columnAdder) / rad2Deg) * radius), -height, Convert.ToSingle(Math.Sin((i + columnAdder) / rad2Deg) * radius)),
+                    new Point3(0, -height, 0),
+                }));
+            }
+
+            objs.Add(new Object(tempTris, location, rotation));
         }
 
         /** INIT METHOD **/
@@ -220,15 +271,18 @@ namespace Three_Dimensional_V3
             // Initialize
             InitializeComponent();
 
-            // Add spheres
-            for (int i = 0; i < 20; i++)
-            {
-                newSphere(new Point3(randGen.Next(-1500, 1500), randGen.Next(-500, 500), randGen.Next(500, 6000)), randGen.Next(50, 300), 6, 12);
-            }
-            for (int i = 0;i < 12;i++)
-            {
-                newCube(new Point3(randGen.Next(-1500, 1500), randGen.Next(-500, 500), randGen.Next(500, 6000)), new Point3(randGen.Next(50, 300), randGen.Next(50, 300), randGen.Next(50, 300)));
-            }
+            // Add objects
+            newCylinder(new Point3(0, 0, 600), 200, 10, 360, new Point3(0, 0, 0));
+            //for (int i = 0; i < 20; i++)
+            //{
+            //    newSphere(new Point3(randGen.Next(-1500, 1500), randGen.Next(-500, 500), randGen.Next(500, 6000)), randGen.Next(50, 300), 6, 12);
+            //}
+            //for (int i = 0;i < 12;i++)
+            //{
+            //    newCube(new Point3(randGen.Next(-1500, 1500), randGen.Next(-500, 500), randGen.Next(500, 6000)), new Point3(randGen.Next(50, 300), randGen.Next(50, 300), randGen.Next(50, 300)), new Point3(0, 0, 0));
+            //}
+
+            // Set resolution
             res = new PointF(this.Width, this.Height); // 800, 450
 
             foreach (Object obj in objs)
@@ -367,8 +421,8 @@ namespace Three_Dimensional_V3
                     if (tri.tri.ShouldBeOnScreen(camera, tri.obj, res))
                     {
                         // Color.FromArgb(Convert.ToInt16(i / 2), Convert.ToInt16(i / 20), Convert.ToInt16(i)))
-                        e.Graphics.FillPolygon(new SolidBrush(Color.FromArgb(Convert.ToInt16(objInts[tri.obj.id] / 2), Convert.ToInt16(objInts[tri.obj.id] / 10), Convert.ToInt16(objInts[tri.obj.id]))), tri.tri.PointsOnScreen(camera, tri.obj, res));
-                        objInts[tri.obj.id] += 255 / tri.obj.tris.Count;
+                        e.Graphics.FillPolygon(new SolidBrush(Color.FromArgb(Convert.ToInt16(objInts[tri.obj.id] / 20), Convert.ToInt16(objInts[tri.obj.id] / 100), Convert.ToInt16(objInts[tri.obj.id]/10))), tri.tri.PointsOnScreen(camera, tri.obj, res));
+                        objInts[tri.obj.id] += 2555 / tri.obj.tris.Count;
                         //e.Graphics.DrawPolygon(new Pen(Color.Black, 2), tri.tri.PointsOnScreen(camera, tri.obj, res, i / 12));
                     }
                 }
