@@ -39,6 +39,54 @@ namespace Three_Dimensional_V3
             }
         }
 
+        void RotateByObject(Object _obj)
+        {
+            float rad2Deg = Convert.ToSingle(180 / Math.PI);
+            for (int i = 0; i < oldPoints.Length; i++)
+            {
+                oldPoints[i].X -= _obj.pos.X;
+                oldPoints[i].Y -= _obj.pos.Y;
+                oldPoints[i].Z -= _obj.pos.Z;
+                // Rotate by X Axis
+                float theta = -_obj.rotation.X / rad2Deg;
+
+                float oldX = 0;
+                float oldZ = 0;
+                oldX += oldPoints[i].X;
+                oldZ += oldPoints[i].Z; // To avoid changing the value of oldpoints
+
+                oldPoints[i].X = Convert.ToSingle((oldX * Math.Cos(theta)) + (oldZ * Math.Sin(theta)));
+                oldPoints[i].Z = Convert.ToSingle((oldZ * Math.Cos(theta)) - (oldX * Math.Sin(theta)));
+
+                // Rotate by Y Axis:
+                theta = -_obj.rotation.Y / rad2Deg;
+
+                oldZ = 0;
+                float oldY = 0;
+                oldY += oldPoints[i].Y;
+                oldZ += oldPoints[i].Z; // To avoid changing the value of oldpoints
+
+                oldPoints[i].Y = Convert.ToSingle((oldY * Math.Cos(theta)) - (oldZ * Math.Sin(theta)));
+                oldPoints[i].Z = Convert.ToSingle((oldZ * Math.Cos(theta)) + (oldY * Math.Sin(theta)));
+
+                // Rotate by Z Axis:
+                theta = -_obj.rotation.Z / rad2Deg;
+
+                oldX = 0;
+                oldY = 0;
+                oldY += oldPoints[i].Y;
+                oldX += oldPoints[i].X; // To avoid changing the value of oldpoints
+
+                oldPoints[i].Y = Convert.ToSingle((oldY * Math.Cos(theta)) - (oldX * Math.Sin(theta)));
+                oldPoints[i].X = Convert.ToSingle((oldX * Math.Cos(theta)) + (oldY * Math.Sin(theta)));
+
+
+                oldPoints[i].X += _obj.pos.X;
+                oldPoints[i].Y += _obj.pos.Y;
+                oldPoints[i].Z += _obj.pos.Z;
+            }
+        }
+
         void TranslateByCamera(Camera _cam)
         {
             for (int i = 0; i < oldPoints.Length; i++)
@@ -75,6 +123,7 @@ namespace Three_Dimensional_V3
         {
             TrianglePointsReset();
             TranslateByObject(_obj);
+            RotateByObject(_obj);
             TranslateByCamera(_cam);
 
             float toRad = Convert.ToSingle(180 / Math.PI);
@@ -82,8 +131,12 @@ namespace Three_Dimensional_V3
             saidZ = 0;
             for (int i = 0; i < oldPoints.Length; i++)
             {
-                saidZ += Convert.ToSingle(Math.Sqrt(Math.Pow(oldPoints[i].X, 2) + Math.Pow(oldPoints[i].Y, 2) + Math.Pow(oldPoints[i].Z, 2)));
-                //saidZ += Convert.ToSingle(Math.Sqrt(Math.Pow(oldPoints[i].Z, 2) + Math.Pow(oldPoints[i].X, 2)));
+
+                float theZ = oldPoints[i].Z - Z0;
+                float theX = oldPoints[i].X * (Z0 / (Z0 + theZ));
+                float theY = oldPoints[i].Y * (Z0 / (Z0 + theZ));
+                saidZ += Convert.ToSingle(theZ);
+                //saidZ += Convert.ToSingle(Math.Sqrt(Math.Pow(oldPoints[i].X, 2) + Math.Pow(oldPoints[i].Y, 2) + Math.Pow(oldPoints[i].Z, 2)));
             }
             saidZ /= 3;
         }
@@ -92,10 +145,13 @@ namespace Three_Dimensional_V3
         {
             TrianglePointsReset();
             TranslateByObject(_obj);
+            RotateByObject(_obj);
             TranslateByCamera(_cam);
 
             float toRad = Convert.ToSingle(180 / Math.PI);
             float Z0 = Convert.ToSingle((_resolution.X / 2) / Math.Tan((_cam.fov / 2) / toRad));
+
+            Point3 theAveragePosition = new Point3(0, 0, 0);
 
             saidZ = 0;
             for (int i = 0; i < points.Length; i++)
@@ -120,6 +176,10 @@ namespace Three_Dimensional_V3
                 {
                     theY = -30000;
                 }
+
+                theAveragePosition.X += theX;
+                theAveragePosition.Y += theY;
+                theAveragePosition.Z += oldPoints[i].Z;
                 //Console.WriteLine($"Z of point {i} is {oldPoints[i].Z}");
                 if (oldPoints[i].Z > 0)
                 {
@@ -129,6 +189,19 @@ namespace Three_Dimensional_V3
                     }
                 }
             }
+            //theAveragePosition.X /= 3;
+            //theAveragePosition.Y /= 3;
+            //theAveragePosition.Z /= 3;
+
+
+            //if (theAveragePosition.Z > 0)
+            //{
+            //    if (theAveragePosition.X > -_resolution.X / 1.9 && theAveragePosition.X < _resolution.X / 1.9 && theAveragePosition.Y > -_resolution.Y / 1.9 && theAveragePosition.Y < _resolution.Y / 1.9)
+            //    {
+            //        return true;
+            //    }
+            //}
+
             return false;
         }
 
@@ -138,6 +211,7 @@ namespace Three_Dimensional_V3
 
             TrianglePointsReset();
             TranslateByObject(_obj);
+            RotateByObject(_obj);
             TranslateByCamera(_cam);
 
             float toRad = Convert.ToSingle(180 / Math.PI);
@@ -167,7 +241,7 @@ namespace Three_Dimensional_V3
                 }
                 thePoints[i].X = theX;
                 thePoints[i].Y = theY;
-                saidZ += Convert.ToSingle(Math.Sqrt(Math.Pow(oldPoints[i].X, 2) + Math.Pow(oldPoints[i].Y, 2) + Math.Pow(oldPoints[i].Z, 2)));
+                saidZ += Convert.ToSingle(theZ);
             }
             saidZ /= 3;
             //Console.WriteLine($"saidZ of tri {thenum} is {saidZ}");
