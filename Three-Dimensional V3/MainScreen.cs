@@ -19,20 +19,25 @@ namespace Three_Dimensional_V3
          * Created: 2021/11/29 - 2021/12/15
          * 
          * -- TO DO --
-         * ~ Hide shapes that aren't visible to the camera (Because other shapes may be covering it)
          * ~ Proper Z-Layering 
          * ~ [PRIORITY] Object rotations
          * ~ Completely in function
          * ~ Convert this program to a reference
-         * ~ [PRIORITY] Add more options for shapes (Cones, Pyramids, Planes, 2D Shapes in 3D, etc.)
-         * ~ [PRIORITY] Turn the cube into a function so it's adjustable
          * 
          * -- BUGS --
          * ~ [PRIORITY] Triangle disappears with all points off screen even though a line still crosses the screen
-         * ~ Triangle covers entire screen when right behind camera
          * ~ Horrible issues at higher FOVS (Probably will never fix)
          * 
          * -- VERSION HISTORY --
+         * 
+         * Version v3.6: (Long awaited!)
+         * - Better Z-Layering (By Splitting triangles)
+         * - You can go through shapes now, looks pretty cool
+         * - Changed the color engine to revert back to closeness by all layers
+         * - Added the Z Buffer into it's own function
+         * 
+         * - Bug Fixed: Triangle covers entire screen when right behind camera
+         * 
          * Version v3.5:
          * - Cones
          * - Added size to cylinders
@@ -69,7 +74,7 @@ namespace Three_Dimensional_V3
         Random randGen = new Random();
 
         /** CAMERA RELATED VARIABLES **/
-        Camera camera = new Camera(70, new Point3(0, 0, 0), new PointF(0, 0), 20000); // Camera
+        Camera camera = new Camera(70, new Point3(0, 0, 0), new PointF(0, 0), 3000); // Camera
         bool[] keys = new bool[256];
 
         /** FPS RELATED VARIABLES **/
@@ -82,6 +87,10 @@ namespace Three_Dimensional_V3
 
         /** SHAPE RELATED VARIABLES **/
         List<Object> objs = new List<Object>();
+        List<SortingTriangle3> trisToSort = new List<SortingTriangle3>();
+        List<float> objInts = new List<float>();
+
+        int test = 0;
 
         /** SHAPE MAKERS **/
         void newSphere(Point3 location, float radius, float rows, float columns)
@@ -319,29 +328,68 @@ namespace Three_Dimensional_V3
                 }),
             }, location, rotation));
         }
+
+        /** 3D MANAGER **/
+        void SetupZBuffer()
+        {
+            trisToSort.Clear();
+            objInts.Clear();
+
+            // Split triangles
+            foreach(Object obj in objs)
+            {
+                int oldTrisCount = 0;
+                oldTrisCount += obj.tris.Count;
+                for (int j = 0;j < oldTrisCount;j ++)
+                {
+                    obj.tris[j].TriangleMaxDist(400, obj.tris);
+                }
+                for(int i = obj.tris.Count-1; i >= 0; i--)
+                {
+                    if (obj.tris[i].isKill)
+                    {
+                        obj.tris.RemoveAt(i);
+                    }
+                }
+            }
+
+            // Add the triangles to an array to be sorted
+            foreach (Object obj in objs)
+            {
+                objInts.Add(0);
+                foreach (Triangle3 tri in obj.tris)
+                {
+                    trisToSort.Add(new SortingTriangle3(tri, obj));
+                }
+            }
+
+            // Sort the triangles
+            for(int i = 0;i < trisToSort.Count;i ++)
+            {
+                trisToSort[i].tri.setupLayering(camera, trisToSort[i].obj, res, trisToSort, i);
+            }
+
+            for(int j = trisToSort.Count-1;j >= 0; j--)
+            {
+                if (trisToSort[j].tri.isKill)
+                {
+                    trisToSort.RemoveAt(j);
+                }
+            }
+
+            trisToSort = trisToSort.OrderByDescending(x => x.tri.saidZ).ToList();
+        }
+
         /** INIT METHOD **/
         public MainScreen()
         {
             // Initialize
             InitializeComponent();
 
-            // Add objects
-            newCylinder(new Point3(150, 0, 1000), new Point3(150, 100, 50), 36, new Point3(0, 0, 0));
-            newSphere(new Point3(450, 0, 1000), 100, 8, 16);
-            newCube(new Point3(-450, 0, 1000), new Point3(100, 100, 100), new Point3(0, 0, 0));
-            newCone(new Point3(-150, 0, 1000), 50, 100, 12, new Point3(0, 0, 0));
-            newPlane(new Point3(0, 100, 1000), new PointF(700,150), new Point3(0, 0, 0));
-
             // Set resolution
             res = new PointF(this.Width, this.Height); // 800, 450
 
-            foreach (Object obj in objs)
-            {
-                foreach (Triangle3 tri in obj.tris)
-                {
-                    tri.PointsOnScreen(camera, obj, res);
-                }
-            }
+            SetupZBuffer();
 
             for(int i = 0;i < keys.Length;i++)
             {
@@ -351,6 +399,7 @@ namespace Three_Dimensional_V3
         /** UPDATE METHOD **/
         private void frameUpdate_Tick(object sender, EventArgs e)
         {
+            // Framerate
             framesSinceLastSecond++;
             accurateSec = DateTime.Now.Second;
             if (lastSec != accurateSec)
@@ -360,13 +409,20 @@ namespace Three_Dimensional_V3
                 framesSinceLastSecond = 0;
             }
 
-            foreach(Object obj in objs)
-            {
-                //obj.rotation.X++;
-                //obj.rotation.Y++;
-                //obj.rotation.Z++;
-            }
+            // Setup objects
+            objs.Clear();
+            Form1.maxid = 0;
 
+            // Add objects
+            
+            //newCylinder(new Point3(150, -1, 1000), new Point3(150, 100, 50), 36, new Point3(0, 0, 0));
+            newSphere(new Point3(450, -1, 1000), 100, 20, 40);
+            //newCube(new Point3(-450, -1, 1000), new Point3(100, 100, 100), new Point3(0, 0, 0));
+            //newCone(new Point3(-150, -1, 1000), 50, 100, 12, new Point3(0, 0, 0));
+            //newPlane(new Point3(0, 100, 1000), new PointF(1000, 1000), new Point3(0, 0, 0));
+
+
+            // Camera movement and rotation
             if (keys[87])
             {
                 camera.pos.X += Convert.ToSingle(Math.Sin(camera.direction.X) * 5);
@@ -411,6 +467,9 @@ namespace Three_Dimensional_V3
             {
                 camera.direction.Y -= Convert.ToSingle(1 / (180 / Math.PI));
             }
+            test++;
+            // Sort objects
+            SetupZBuffer();
             this.Refresh();
         }
 
@@ -420,35 +479,17 @@ namespace Three_Dimensional_V3
             e.Graphics.TranslateTransform(res.X / 2, res.Y / 2);
 
 
-            // Add the triangles to an array to be sorted
-            List<SortingTriangle3> trisToSort = new List<SortingTriangle3>();
-            List<float> objInts = new List<float>();
-            foreach(Object obj in objs)
-            {
-                objInts.Add(0); 
-                foreach (Triangle3 tri in obj.tris)
-                {
-                    trisToSort.Add(new SortingTriangle3(tri, obj));
-                }
-            }
-
-            // Sort the triangles
-            foreach (SortingTriangle3 tri in trisToSort)
-            {
-                tri.tri.setupLayering(camera, tri.obj, res);
-            }
-            trisToSort = trisToSort.OrderByDescending(x => x.tri.saidZ).ToList();
-
             // Draw the triangles
+            int i = 0;
             foreach (SortingTriangle3 tri in trisToSort)
             {
+                i++;
                 if (tri.needsToDraw)
                 {
                     if (tri.tri.ShouldBeOnScreen(camera, tri.obj, res))
                     {
                         // Color.FromArgb(Convert.ToInt16(i / 2), Convert.ToInt16(i / 20), Convert.ToInt16(i)))
-                        e.Graphics.FillPolygon(new SolidBrush(Color.FromArgb(Convert.ToInt16(objInts[tri.obj.id] / 20), Convert.ToInt16(objInts[tri.obj.id] / 100), Convert.ToInt16(objInts[tri.obj.id]/10))), tri.tri.PointsOnScreen(camera, tri.obj, res));
-                        objInts[tri.obj.id] += 2555 / tri.obj.tris.Count;
+                        e.Graphics.FillPolygon(new SolidBrush(Color.FromArgb(Convert.ToInt16(i * (255f / trisToSort.Count) / 2f), Convert.ToInt16(i * (255f / trisToSort.Count) / 100f), Convert.ToInt16(i * (255f / trisToSort.Count)))), tri.tri.PointsOnScreen(camera, tri.obj, res));
                         //e.Graphics.DrawPolygon(new Pen(Color.Black, 2), tri.tri.PointsOnScreen(camera, tri.obj, res, i / 12));
                     }
                 }

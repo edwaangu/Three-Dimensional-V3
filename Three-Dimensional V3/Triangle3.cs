@@ -14,10 +14,431 @@ namespace Three_Dimensional_V3
         public Point3[] oldPoints = new Point3[3];
 
         public float saidZ;
+        public bool isKill = false;
+
+        public bool isCutTriangle = false;
 
         public Triangle3(Point3[] _points)
         {
             points = _points;
+        }
+
+        // Cutoff Triangle
+        public void cutoffTriangle(float cutoffZ, List<SortingTriangle3> _tris, Object _obj, int debugI)
+        {
+            // Hide Triangle3 completely
+            if (oldPoints[0].Z < cutoffZ && oldPoints[1].Z < cutoffZ && oldPoints[2].Z < cutoffZ)
+            {
+                isKill = true;
+                //Console.WriteLine($"Triangle {debugI} at coords X:{oldPoints[0].X} Y:{oldPoints[0].Y} Z:{oldPoints[0].Z}, X:{oldPoints[1].X} Y:{oldPoints[1].Y} Z:{oldPoints[1].Z}, was deleted");
+                return;
+            }
+
+            // Don't change Triangle3 at all
+            if (oldPoints[0].Z >= cutoffZ && oldPoints[1].Z >= cutoffZ && oldPoints[2].Z >= cutoffZ)
+            {
+                isKill = false;
+                //Console.WriteLine($"Triangle {debugI} at coords X:{oldPoints[0].X} Y:{oldPoints[0].Y} Z:{oldPoints[0].Z}, X:{oldPoints[1].X} Y:{oldPoints[1].Y} Z:{oldPoints[1].Z},  X:{oldPoints[2].X} Y:{oldPoints[2].Y} Z:{oldPoints[2].Z}, was fully shown");
+                return;
+            }
+
+            // One point is less than cutoff, other two oldPoints are more than cutoff
+            if (oldPoints[0].Z < cutoffZ && oldPoints[1].Z >= cutoffZ && oldPoints[2].Z >= cutoffZ) // If point 0 is less than cutoff
+            {
+                // Get slopes and new positions
+                float slopeY = (oldPoints[1].Y - oldPoints[0].Y) / (oldPoints[1].Z - oldPoints[0].Z);
+                float newY1 = slopeY * (cutoffZ - oldPoints[0].Z) + oldPoints[0].Y;
+
+                float slopeY2 = (oldPoints[2].Y - oldPoints[0].Y) / (oldPoints[2].Z - oldPoints[0].Z);
+                float newY2 = slopeY2 * (cutoffZ - oldPoints[0].Z) + oldPoints[0].Y;
+
+                float slopeX = (oldPoints[1].X - oldPoints[0].X) / (oldPoints[1].Z - oldPoints[0].Z);
+                float newX1 = slopeX * (cutoffZ - oldPoints[0].Z) + oldPoints[0].X;
+
+                float slopeX2 = (oldPoints[2].X - oldPoints[0].X) / (oldPoints[2].Z - oldPoints[0].Z);
+                float newX2 = slopeX2 * (cutoffZ - oldPoints[0].Z) + oldPoints[0].X;
+
+                if (oldPoints[2].Z > oldPoints[1].Z)
+                {
+                    // Triangle 1
+                    _tris.Add(new SortingTriangle3(new Triangle3(new Point3[]{
+                        new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f)
+                    }), _obj));
+                    _tris[_tris.Count - 1].tri.isCutTriangle = true;
+                    _tris[_tris.Count - 1].tri.oldPoints = new Point3[3]
+                    {
+                        new Point3(oldPoints[2].X, oldPoints[2].Y, oldPoints[2].Z),
+                        new Point3(newX2, newY2, cutoffZ),
+                        new Point3(newX1, newY1, cutoffZ)
+                    };
+
+                    // Triangle 2
+                    _tris.Add(new SortingTriangle3(new Triangle3(new Point3[]{
+                        new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f)
+                    }), _obj));
+                    _tris[_tris.Count - 1].tri.isCutTriangle = true;
+                    _tris[_tris.Count - 1].tri.oldPoints = new Point3[3]
+                    {
+                        new Point3(oldPoints[2].X, oldPoints[2].Y, oldPoints[2].Z),
+                        new Point3(oldPoints[1].X, oldPoints[1].Y, oldPoints[1].Z),
+                        new Point3(newX1, newY1, cutoffZ)
+                    };
+                }
+                else
+                {
+                    // Triangle 1
+                    _tris.Add(new SortingTriangle3(new Triangle3(new Point3[]{
+                        new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f)
+                    }), _obj));
+                    _tris[_tris.Count - 1].tri.isCutTriangle = true;
+                    _tris[_tris.Count - 1].tri.oldPoints = new Point3[3]
+                    {
+                        new Point3(oldPoints[1].X, oldPoints[1].Y, oldPoints[1].Z),
+                        new Point3(newX2, newY2, cutoffZ),
+                        new Point3(newX1, newY1, cutoffZ)
+                    };
+
+                    // Triangle 2
+                    _tris.Add(new SortingTriangle3(new Triangle3(new Point3[]{
+                        new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f)
+                    }), _obj));
+                    _tris[_tris.Count - 1].tri.isCutTriangle = true;
+                    _tris[_tris.Count - 1].tri.oldPoints = new Point3[3]
+                    {
+                        new Point3(oldPoints[2].X, oldPoints[2].Y, oldPoints[2].Z),
+                        new Point3(oldPoints[1].X, oldPoints[1].Y, oldPoints[1].Z),
+                        new Point3(newX2, newY2, cutoffZ)
+                    };
+                }
+                //Console.WriteLine($"Triangle {debugI} at coords X:{oldPoints[0].X} Y:{oldPoints[0].Y} Z:{oldPoints[0].Z}, X:{oldPoints[1].X} Y:{oldPoints[1].Y} Z:{oldPoints[1].Z},  X:{oldPoints[2].X} Y:{oldPoints[2].Y} Z:{oldPoints[2].Z}, had its 0 point cut");
+                isKill = true;
+                return;
+            }
+            if (oldPoints[1].Z < cutoffZ && oldPoints[0].Z >= cutoffZ && oldPoints[2].Z >= cutoffZ) // If point 1 is less than cutoff
+            {
+                float slopeY = (oldPoints[0].Y - oldPoints[1].Y) / (oldPoints[0].Z - oldPoints[1].Z);
+                float newY1 = slopeY * (cutoffZ - oldPoints[1].Z) + oldPoints[1].Y;
+
+                float slopeY2 = (oldPoints[2].Y - oldPoints[1].Y) / (oldPoints[2].Z - oldPoints[1].Z);
+                float newY2 = slopeY2 * (cutoffZ - oldPoints[1].Z) + oldPoints[1].Y;
+
+                float slopeX = (oldPoints[0].X - oldPoints[1].X) / (oldPoints[0].Z - oldPoints[1].Z);
+                float newX1 = slopeX * (cutoffZ - oldPoints[1].Z) + oldPoints[1].X;
+
+                float slopeX2 = (oldPoints[2].X - oldPoints[1].X) / (oldPoints[2].Z - oldPoints[1].Z);
+                float newX2 = slopeX2 * (cutoffZ - oldPoints[1].Z) + oldPoints[1].X;
+
+                if (oldPoints[2].Z > oldPoints[0].Z)
+                {
+                    _tris.Add(new SortingTriangle3(new Triangle3(new Point3[]{
+                        new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f)
+                    }), _obj));
+                    _tris[_tris.Count - 1].tri.isCutTriangle = true;
+                    _tris[_tris.Count - 1].tri.oldPoints = new Point3[3]
+                    {
+                        new Point3(oldPoints[2].X, oldPoints[2].Y, oldPoints[2].Z),
+                        new Point3(newX2, newY2, cutoffZ),
+                        new Point3(newX1, newY1, cutoffZ)
+                    };
+                    _tris.Add(new SortingTriangle3(new Triangle3(new Point3[]{
+                        new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f)
+                    }), _obj));
+                    _tris[_tris.Count - 1].tri.isCutTriangle = true;
+                    _tris[_tris.Count - 1].tri.oldPoints = new Point3[3]
+                    {
+                        new Point3(oldPoints[2].X, oldPoints[2].Y, oldPoints[2].Z),
+                        new Point3(oldPoints[0].X, oldPoints[0].Y, oldPoints[0].Z),
+                        new Point3(newX1, newY1, cutoffZ)
+                    };
+                }
+                else
+                {
+                    _tris.Add(new SortingTriangle3(new Triangle3(new Point3[]{
+                        new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f)
+                    }), _obj));
+                    _tris[_tris.Count - 1].tri.isCutTriangle = true;
+                    _tris[_tris.Count - 1].tri.oldPoints = new Point3[3]
+                    {
+                        new Point3(oldPoints[0].X, oldPoints[0].Y, oldPoints[0].Z),
+                        new Point3(newX2, newY2, cutoffZ),
+                        new Point3(newX1, newY1, cutoffZ)
+                    };
+
+                    _tris.Add(new SortingTriangle3(new Triangle3(new Point3[]{
+                        new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f)
+                    }), _obj));
+                    _tris[_tris.Count - 1].tri.isCutTriangle = true;
+                    _tris[_tris.Count - 1].tri.oldPoints = new Point3[3]
+                    {
+                        new Point3(oldPoints[2].X, oldPoints[2].Y, oldPoints[2].Z),
+                        new Point3(oldPoints[0].X, oldPoints[0].Y, oldPoints[0].Z),
+                        new Point3(newX2, newY2, cutoffZ)
+                    };
+                }
+                //Console.WriteLine($"Triangle {debugI} at coords X:{oldPoints[0].X} Y:{oldPoints[0].Y} Z:{oldPoints[0].Z}, X:{oldPoints[1].X} Y:{oldPoints[1].Y} Z:{oldPoints[1].Z},  X:{oldPoints[2].X} Y:{oldPoints[2].Y} Z:{oldPoints[2].Z}, had its 1 point cut");
+                isKill = true;
+                return;
+            }
+            if (oldPoints[2].Z < cutoffZ && oldPoints[1].Z >= cutoffZ && oldPoints[0].Z >= cutoffZ) // If point 2 is less than cutoff
+            {
+
+                float slopeY = (oldPoints[1].Y - oldPoints[2].Y) / (oldPoints[1].Z - oldPoints[2].Z);
+                float newY1 = slopeY * (cutoffZ - oldPoints[2].Z) + oldPoints[2].Y;
+
+                float slopeY2 = (oldPoints[0].Y - oldPoints[2].Y) / (oldPoints[0].Z - oldPoints[2].Z);
+                float newY2 = slopeY2 * (cutoffZ - oldPoints[2].Z) + oldPoints[2].Y;
+
+                float slopeX = (oldPoints[1].X - oldPoints[2].X) / (oldPoints[1].Z - oldPoints[2].Z);
+                float newX1 = slopeX * (cutoffZ - oldPoints[2].Z) + oldPoints[2].X;
+
+                float slopeX2 = (oldPoints[0].X - oldPoints[2].X) / (oldPoints[0].Z - oldPoints[2].Z);
+                float newX2 = slopeX2 * (cutoffZ - oldPoints[2].Z) + oldPoints[2].X;
+
+                if (oldPoints[0].Z > oldPoints[1].Z)
+                {
+                    _tris.Add(new SortingTriangle3(new Triangle3(new Point3[]{
+                        new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f)
+                    }), _obj));
+                    _tris[_tris.Count - 1].tri.isCutTriangle = true;
+                    _tris[_tris.Count - 1].tri.oldPoints = new Point3[3]
+                    {
+                        new Point3(oldPoints[0].X, oldPoints[0].Y, oldPoints[0].Z),
+                        new Point3(newX2, newY2, cutoffZ),
+                        new Point3(newX1, newY1, cutoffZ)
+                    };
+
+                    _tris.Add(new SortingTriangle3(new Triangle3(new Point3[]{
+                        new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f)
+                    }), _obj));
+                    _tris[_tris.Count - 1].tri.isCutTriangle = true;
+                    _tris[_tris.Count - 1].tri.oldPoints = new Point3[3]
+                    {
+                        new Point3(oldPoints[0].X, oldPoints[0].Y, oldPoints[0].Z),
+                        new Point3(oldPoints[1].X, oldPoints[1].Y, oldPoints[1].Z),
+                        new Point3(newX1, newY1, cutoffZ)
+                    };
+                }
+                else
+                {
+
+                    _tris.Add(new SortingTriangle3(new Triangle3(new Point3[]{
+                        new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f)
+                    }), _obj));
+                    _tris[_tris.Count - 1].tri.isCutTriangle = true;
+                    _tris[_tris.Count - 1].tri.oldPoints = new Point3[3]
+                    {
+                        new Point3(oldPoints[1].X, oldPoints[1].Y, oldPoints[1].Z),
+                        new Point3(newX2, newY2, cutoffZ),
+                        new Point3(newX1, newY1, cutoffZ)
+                    };
+
+                    _tris.Add(new SortingTriangle3(new Triangle3(new Point3[]{
+                        new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f)
+                    }), _obj));
+                    _tris[_tris.Count - 1].tri.isCutTriangle = true;
+                    _tris[_tris.Count - 1].tri.oldPoints = new Point3[3]
+                    {
+                        new Point3(oldPoints[0].X, oldPoints[0].Y, oldPoints[0].Z),
+                        new Point3(oldPoints[1].X, oldPoints[1].Y, oldPoints[1].Z),
+                        new Point3(newX2, newY2, cutoffZ)
+                    };
+                }
+                //Console.WriteLine($"Triangle {debugI} at coords X:{oldPoints[0].X} Y:{oldPoints[0].Y} Z:{oldPoints[0].Z}, X:{oldPoints[1].X} Y:{oldPoints[1].Y} Z:{oldPoints[1].Z},  X:{oldPoints[2].X} Y:{oldPoints[2].Y} Z:{oldPoints[2].Z}, had its 2 point cut");
+                isKill = true;
+                return;
+            }
+
+            // Two oldPoints are less than cutoff, other point is more than cutoff
+            if (oldPoints[0].Z >= cutoffZ && oldPoints[1].Z < cutoffZ && oldPoints[2].Z < cutoffZ) // If point 0 is more than cutoff
+            {
+                // Point 1
+                float slopeY = (oldPoints[0].Y - oldPoints[1].Y) / (oldPoints[0].Z - oldPoints[1].Z);
+                float newY1 = slopeY * (cutoffZ - oldPoints[1].Z) + oldPoints[1].Y;
+
+                // Point 2
+                float slopeY2 = (oldPoints[0].Y - oldPoints[2].Y) / (oldPoints[0].Z - oldPoints[2].Z);
+                float newY2 = slopeY2 * (cutoffZ - oldPoints[2].Z) + oldPoints[2].Y;
+
+                // Point 1
+                float slopeX = (oldPoints[0].X - oldPoints[1].X) / (oldPoints[0].Z - oldPoints[1].Z);
+                float newX1 = slopeX * (cutoffZ - oldPoints[1].Z) + oldPoints[1].X;
+
+                // Point 2
+                float slopeX2 = (oldPoints[0].X - oldPoints[2].X) / (oldPoints[0].Z - oldPoints[2].Z);
+                float newX2 = slopeX2 * (cutoffZ - oldPoints[2].Z) + oldPoints[2].X;
+
+                _tris.Add(new SortingTriangle3(new Triangle3(new Point3[]{
+                        new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f)
+                    }), _obj));
+                _tris[_tris.Count - 1].tri.isCutTriangle = true;
+                _tris[_tris.Count - 1].tri.oldPoints = new Point3[3]
+                {
+                    new Point3(oldPoints[0].X, oldPoints[0].Y, oldPoints[0].Z),
+                    new Point3(newX1, newY1, cutoffZ),
+                    new Point3(newX2, newY2, cutoffZ)
+                };
+                isKill = true;
+                //Console.WriteLine($"Triangle {debugI} at coords X:{oldPoints[0].X} Y:{oldPoints[0].Y} Z:{oldPoints[0].Z}, X:{oldPoints[1].X} Y:{oldPoints[1].Y} Z:{oldPoints[1].Z},  X:{oldPoints[2].X} Y:{oldPoints[2].Y} Z:{oldPoints[2].Z}, had its 1 and 2 points cut");
+                return;
+            }
+            if (oldPoints[1].Z >= cutoffZ && oldPoints[0].Z < cutoffZ && oldPoints[2].Z < cutoffZ) // If point 1 is more than cutoff
+            {
+
+                // Point 0
+                float slopeY = (oldPoints[1].Y - oldPoints[0].Y) / (oldPoints[1].Z - oldPoints[0].Z);
+                float newY1 = slopeY * (cutoffZ - oldPoints[0].Z) + oldPoints[0].Y;
+
+                // Point 2
+                float slopeY2 = (oldPoints[1].Y - oldPoints[2].Y) / (oldPoints[1].Z - oldPoints[2].Z);
+                float newY2 = slopeY2 * (cutoffZ - oldPoints[2].Z) + oldPoints[2].Y;
+
+                // Point 0
+                float slopeX = (oldPoints[1].X - oldPoints[0].X) / (oldPoints[1].Z - oldPoints[0].Z);
+                float newX1 = slopeX * (cutoffZ - oldPoints[0].Z) + oldPoints[0].X;
+
+                // Point 2
+                float slopeX2 = (oldPoints[1].X - oldPoints[2].X) / (oldPoints[1].Z - oldPoints[2].Z);
+                float newX2 = slopeX2 * (cutoffZ - oldPoints[2].Z) + oldPoints[2].X;
+
+                _tris.Add(new SortingTriangle3(new Triangle3(new Point3[]{
+                        new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f)
+                    }), _obj));
+                _tris[_tris.Count - 1].tri.isCutTriangle = true;
+                _tris[_tris.Count - 1].tri.oldPoints = new Point3[3]
+                {
+                    new Point3(newX1, newY1, cutoffZ),
+                    new Point3(oldPoints[1].X, oldPoints[1].Y, oldPoints[1].Z),
+                    new Point3(newX2, newY2, cutoffZ)
+                };
+                isKill = true;
+                //Console.WriteLine($"Triangle {debugI} at coords X:{oldPoints[0].X} Y:{oldPoints[0].Y} Z:{oldPoints[0].Z}, X:{oldPoints[1].X} Y:{oldPoints[1].Y} Z:{oldPoints[1].Z},  X:{oldPoints[2].X} Y:{oldPoints[2].Y} Z:{oldPoints[2].Z}, had its 0 and 2 points cut");
+                return;
+            }
+            if (oldPoints[2].Z >= cutoffZ && oldPoints[1].Z < cutoffZ && oldPoints[0].Z < cutoffZ) // If point 2 is more than cutoff
+            {
+                // Point 0
+                float slopeY2 = (oldPoints[2].Y - oldPoints[0].Y) / (oldPoints[2].Z - oldPoints[0].Z);
+                float newY2 = slopeY2 * (cutoffZ - oldPoints[0].Z) + oldPoints[0].Y;
+
+                // Point 1
+                float slopeY = (oldPoints[2].Y - oldPoints[1].Y) / (oldPoints[2].Z - oldPoints[1].Z);
+                float newY1 = slopeY * (cutoffZ - oldPoints[1].Z) + oldPoints[1].Y;
+
+                // Point 0
+                float slopeX2 = (oldPoints[2].X - oldPoints[0].X) / (oldPoints[2].Z - oldPoints[0].Z);
+                float newX2 = slopeX2 * (cutoffZ - oldPoints[0].Z) + oldPoints[0].X;
+
+                // Point 1
+                float slopeX = (oldPoints[2].X - oldPoints[1].X) / (oldPoints[2].Z - oldPoints[1].Z);
+                float newX1 = slopeX * (cutoffZ - oldPoints[1].Z) + oldPoints[1].X;
+
+                _tris.Add(new SortingTriangle3(new Triangle3(new Point3[]{
+                        new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f)
+                    }), _obj));
+                _tris[_tris.Count - 1].tri.isCutTriangle = true;
+                _tris[_tris.Count - 1].tri.oldPoints = new Point3[3]
+                {
+                    new Point3(newX2, newY2, cutoffZ),
+                    new Point3(newX1, newY1, cutoffZ),
+                    new Point3(oldPoints[2].X, oldPoints[2].Y, oldPoints[2].Z)
+                };
+                //Console.WriteLine($"Triangle {debugI} at coords X:{oldPoints[0].X} Y:{oldPoints[0].Y} Z:{oldPoints[0].Z}, X:{oldPoints[1].X} Y:{oldPoints[1].Y} Z:{oldPoints[1].Z},  X:{oldPoints[2].X} Y:{oldPoints[2].Y} Z:{oldPoints[2].Z}, had its 0 and 1 points cut");
+                isKill = true;
+                return;
+            }
+        }
+
+        float GetDistanceBetweenPoints(Point3 _p1, Point3 _p2)
+        {
+            return Convert.ToSingle(Math.Sqrt(Math.Pow(_p2.X - _p1.X, 2) + Math.Pow(_p2.Y - _p1.Y, 2) + Math.Pow(_p2.Z - _p1.Z, 2)));
+        }
+
+        public void TriangleMaxDist(int maxdist, List<Triangle3> _tris)
+        {
+
+            float dist0 = GetDistanceBetweenPoints(points[1], points[2]);
+            float dist1 = GetDistanceBetweenPoints(points[0], points[2]);
+            float dist2 = GetDistanceBetweenPoints(points[1], points[0]);
+            if (dist0 <= maxdist && dist1 <= maxdist && dist2 <= maxdist)
+            {
+                isKill = false;
+            }
+            else
+            {
+                if (dist0 >= dist1 && dist0 >= dist2)
+                {
+                    if (dist0 > maxdist)
+                    {
+                        float avgX = (points[1].X + points[2].X) / 2;
+                        float avgY = (points[1].Y + points[2].Y) / 2;
+                        float avgZ = (points[1].Z + points[2].Z) / 2;
+
+                        _tris.Add(new Triangle3(new Point3[]
+                        {
+                        new Point3(avgX, avgY, avgZ),
+                        new Point3(points[0].X, points[0].Y, points[0].Z),
+                        new Point3(points[1].X, points[1].Y, points[1].Z)
+                        }));
+                        _tris[_tris.Count - 1].TriangleMaxDist(maxdist, _tris);
+                        _tris.Add(new Triangle3(new Point3[]
+                        {
+                        new Point3(avgX, avgY, avgZ),
+                        new Point3(points[0].X, points[0].Y, points[0].Z),
+                        new Point3(points[2].X, points[2].Y, points[2].Z)
+                        }));
+                        _tris[_tris.Count - 1].TriangleMaxDist(maxdist, _tris);
+                    }
+                }
+                else if (dist1 >= dist0 && dist1 >= dist2)
+                {
+                    if (dist1 > maxdist)
+                    {
+                        float avgX = (points[1].X + points[2].X) / 2;
+                        float avgY = (points[1].Y + points[2].Y) / 2;
+                        float avgZ = (points[1].Z + points[2].Z) / 2;
+
+                        _tris.Add(new Triangle3(new Point3[]
+                        {
+                        new Point3(avgX, avgY, avgZ),
+                        new Point3(points[0].X, points[0].Y, points[0].Z),
+                        new Point3(points[1].X, points[1].Y, points[1].Z)
+                        }));
+                        _tris[_tris.Count - 1].TriangleMaxDist(maxdist, _tris);
+                        _tris.Add(new Triangle3(new Point3[]
+                        {
+                        new Point3(avgX, avgY, avgZ),
+                        new Point3(points[0].X, points[0].Y, points[0].Z),
+                        new Point3(points[2].X, points[2].Y, points[2].Z)
+                        }));
+                        _tris[_tris.Count - 1].TriangleMaxDist(maxdist, _tris);
+                    }
+                }
+                else
+                {
+                    if (dist2 > maxdist)
+                    {
+                        float avgX = (points[1].X + points[0].X) / 2;
+                        float avgY = (points[1].Y + points[0].Y) / 2;
+                        float avgZ = (points[1].Z + points[0].Z) / 2;
+
+                        _tris.Add(new Triangle3(new Point3[]
+                        {
+                        new Point3(avgX, avgY, avgZ),
+                        new Point3(points[2].X, points[2].Y, points[2].Z),
+                        new Point3(points[1].X, points[1].Y, points[1].Z)
+                        }));
+                        _tris[_tris.Count - 1].TriangleMaxDist(maxdist, _tris);
+                        _tris.Add(new Triangle3(new Point3[]
+                        {
+                        new Point3(avgX, avgY, avgZ),
+                        new Point3(points[2].X, points[2].Y, points[2].Z),
+                        new Point3(points[0].X, points[0].Y, points[0].Z)
+                        }));
+                        _tris[_tris.Count - 1].TriangleMaxDist(maxdist, _tris);
+                    }
+                }
+                isKill = true;
+            }
         }
 
         void TrianglePointsReset()
@@ -119,15 +540,22 @@ namespace Three_Dimensional_V3
             }
         }
 
-        public void setupLayering(Camera _cam, Object _obj, PointF _resolution)
+        public void setupLayering(Camera _cam, Object _obj, PointF _resolution, List<SortingTriangle3> _tris, int debugI)
         {
-            TrianglePointsReset();
-            TranslateByObject(_obj);
-            RotateByObject(_obj);
-            TranslateByCamera(_cam);
+            if (isCutTriangle == false)
+            {
+                TrianglePointsReset();
+                TranslateByObject(_obj);
+                RotateByObject(_obj);
+                TranslateByCamera(_cam);
+            }
 
             float toRad = Convert.ToSingle(180 / Math.PI);
             float Z0 = Convert.ToSingle((_resolution.X / 2) / Math.Tan((_cam.fov / 2) / toRad));
+            if(isCutTriangle == false)
+            {
+                cutoffTriangle(Z0 /3, _tris, _obj, debugI);
+            }
             saidZ = 0;
             for (int i = 0; i < oldPoints.Length; i++)
             {
@@ -135,18 +563,21 @@ namespace Three_Dimensional_V3
                 float theZ = oldPoints[i].Z - Z0;
                 float theX = oldPoints[i].X * (Z0 / (Z0 + theZ));
                 float theY = oldPoints[i].Y * (Z0 / (Z0 + theZ));
-                saidZ += Convert.ToSingle(theZ);
-                //saidZ += Convert.ToSingle(Math.Sqrt(Math.Pow(oldPoints[i].X, 2) + Math.Pow(oldPoints[i].Y, 2) + Math.Pow(oldPoints[i].Z, 2)));
+                //saidZ += Convert.ToSingle(theZ);
+                saidZ += Convert.ToSingle(Math.Sqrt(Math.Pow(oldPoints[i].X, 2) + Math.Pow(oldPoints[i].Y, 2) + Math.Pow(oldPoints[i].Z, 2)));
             }
             saidZ /= 3;
         }
         
         public bool ShouldBeOnScreen(Camera _cam, Object _obj, PointF _resolution)
         {
-            TrianglePointsReset();
-            TranslateByObject(_obj);
-            RotateByObject(_obj);
-            TranslateByCamera(_cam);
+            if (isCutTriangle == false)
+            {
+                TrianglePointsReset();
+                TranslateByObject(_obj);
+                RotateByObject(_obj);
+                TranslateByCamera(_cam);
+            }
 
             float toRad = Convert.ToSingle(180 / Math.PI);
             float Z0 = Convert.ToSingle((_resolution.X / 2) / Math.Tan((_cam.fov / 2) / toRad));
@@ -180,7 +611,7 @@ namespace Three_Dimensional_V3
                 theAveragePosition.X += theX;
                 theAveragePosition.Y += theY;
                 theAveragePosition.Z += oldPoints[i].Z;
-                //Console.WriteLine($"Z of point {i} is {oldPoints[i].Z}");
+                ////Console.WriteLine($"Z of point {i} is {oldPoints[i].Z}");
                 if (oldPoints[i].Z > 0)
                 {
                     if (theX > -_resolution.X / 1.9 && theX < _resolution.X / 1.9 && theY > -_resolution.Y / 1.9 && theY < _resolution.Y / 1.9 && Math.Sqrt((Math.Pow(oldPoints[i].X, 2) + Math.Pow(oldPoints[i].Y, 2) + Math.Pow(oldPoints[i].Z, 2))) < _cam.maximumRenderDistance)
@@ -209,10 +640,13 @@ namespace Three_Dimensional_V3
         {
             PointF[] thePoints = new PointF[3];
 
-            TrianglePointsReset();
-            TranslateByObject(_obj);
-            RotateByObject(_obj);
-            TranslateByCamera(_cam);
+            if (isCutTriangle == false)
+            {
+                TrianglePointsReset();
+                TranslateByObject(_obj);
+                RotateByObject(_obj);
+                TranslateByCamera(_cam);
+            }
 
             float toRad = Convert.ToSingle(180 / Math.PI);
             float Z0 = Convert.ToSingle((_resolution.X / 2) / Math.Tan((_cam.fov / 2) / toRad));
@@ -241,10 +675,10 @@ namespace Three_Dimensional_V3
                 }
                 thePoints[i].X = theX;
                 thePoints[i].Y = theY;
-                saidZ += Convert.ToSingle(theZ);
+                saidZ += Convert.ToSingle(Math.Sqrt(Math.Pow(oldPoints[i].X, 2) + Math.Pow(oldPoints[i].Y, 2) + Math.Pow(oldPoints[i].Z, 2)));
             }
             saidZ /= 3;
-            //Console.WriteLine($"saidZ of tri {thenum} is {saidZ}");
+            ////Console.WriteLine($"saidZ of tri {thenum} is {saidZ}");
 
             return thePoints;
         }
