@@ -16,7 +16,7 @@ namespace Three_Dimensional_V3
         /**
          * -- Three-Dimensional V3 -- 
          * Made by Ted Angus
-         * Created: 2021/11/29 - 2021/12/15
+         * Created: 2021/11/29 - 2022/1/13
          * 
          * -- TO DO --
          * ~ Proper Z-Layering 
