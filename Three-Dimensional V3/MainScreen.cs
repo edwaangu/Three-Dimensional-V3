@@ -83,7 +83,41 @@ namespace Three_Dimensional_V3
         int lastSec = -1;
         int fps = 0;
 
+        // Millisecond differences
+        int lastMillis = 0;
+        int lastSecond = 0;
 
+        int getMillisSinceLast()
+        {
+            int theTime;
+            if (DateTime.Now.Second < lastSecond)
+            {
+                if (DateTime.Now.Millisecond < lastMillis)
+                {
+                    theTime = 60000 + ((DateTime.Now.Second - lastSecond) * 1000) + 1000 + (DateTime.Now.Millisecond - lastMillis);
+                }
+                else
+                {
+                    theTime = 60000 + ((DateTime.Now.Second - lastSecond) * 1000) + (DateTime.Now.Millisecond - lastMillis);
+                }
+            }
+            else
+            {
+                if (DateTime.Now.Millisecond < lastMillis)
+                {
+                    theTime = ((DateTime.Now.Second - lastSecond) * 1000) + 1000 + (DateTime.Now.Millisecond - lastMillis);
+                }
+                else
+                {
+                    theTime = ((DateTime.Now.Second - lastSecond) * 1000) + (DateTime.Now.Millisecond - lastMillis);
+                }
+            }
+            return theTime;
+        }
+
+        int objCreateTime;
+        int zBufferTime;
+        int drawTime;
 
         /** SHAPE RELATED VARIABLES **/
         List<Object> objs = new List<Object>();
@@ -93,7 +127,7 @@ namespace Three_Dimensional_V3
         int test = 0;
 
         /** SHAPE MAKERS **/
-        void newSphere(Point3 location, float radius, float rows, float columns)
+        void newSphere(Point3 location, float radius, float rows, float columns, Color _c)
         {
             // Create a list of triangles to update
             List<Triangle3> tempTris = new List<Triangle3>();
@@ -129,7 +163,7 @@ namespace Three_Dimensional_V3
                             Convert.ToSingle(Math.Cos(dirHorizontal + columnAdder) * radius * Math.Cos(dirVertical + rowAdder)),
                             Convert.ToSingle(Math.Sin(dirVertical + rowAdder) * radius), 
                             Convert.ToSingle(Math.Sin(dirHorizontal + columnAdder) * radius * Math.Cos(dirVertical + rowAdder)))
-                    });
+                    }, _c);
                     Triangle3 tempTri2 = new Triangle3(new Point3[] {
                         new Point3(
                             Convert.ToSingle(Math.Cos(dirHorizontal) * radius * Math.Cos(dirVertical)),
@@ -143,7 +177,7 @@ namespace Three_Dimensional_V3
                             Convert.ToSingle(Math.Cos(dirHorizontal + columnAdder) * radius * Math.Cos(dirVertical + rowAdder)),
                             Convert.ToSingle(Math.Sin(dirVertical + rowAdder) * radius),
                             Convert.ToSingle(Math.Sin(dirHorizontal + columnAdder) * radius * Math.Cos(dirVertical + rowAdder)))
-                    });
+                    }, _c);
 
                     tempTris.Add(tempTri);
                     tempTris.Add(tempTri2);
@@ -154,7 +188,7 @@ namespace Three_Dimensional_V3
             objs.Add(new Object(tempTris, location, new Point3(0, 0, 0)));
         }
 
-        void newCube(Point3 location, Point3 size, Point3 rotation)
+        void newCube(Point3 location, Point3 size, Point3 rotation, Color _c)
         {
             // Create 12 triangles, 2 for each side
             objs.Add(new Object(new List<Triangle3>() {
@@ -163,76 +197,76 @@ namespace Three_Dimensional_V3
                     new Point3(-size.X, -size.Y, -size.Z),
                     new Point3(-size.X, size.Y, -size.Z),
                     new Point3(size.X, -size.Y, -size.Z),
-                }),
+                }, _c),
                 new Triangle3( new Point3[] {
                     new Point3(size.X, size.Y, -size.Z),
                     new Point3(-size.X, size.Y, -size.Z),
                     new Point3(size.X, -size.Y, -size.Z),
-                }),
+                }, _c),
                 // Right Side
                 
                 new Triangle3( new Point3[] {
                     new Point3(size.X, -size.Y, -size.Z),
                     new Point3(size.X, size.Y, -size.Z),
                     new Point3(size.X, -size.Y, size.Z),
-                }),
+                }, _c),
                 new Triangle3( new Point3[] {
                     new Point3(size.X, size.Y, size.Z),
                     new Point3(size.X, size.Y, -size.Z),
                     new Point3(size.X, -size.Y, size.Z),
-                }),
+                }, _c),
 
                 // Left Side
                 new Triangle3( new Point3[] {
                     new Point3(-size.X, -size.Y, -size.Z),
                     new Point3(-size.X, size.Y, -size.Z),
                     new Point3(-size.X, -size.Y, size.Z),
-                }),
+                }, _c),
                 new Triangle3( new Point3[] {
                     new Point3(-size.X, size.Y, size.Z),
                     new Point3(-size.X, size.Y, -size.Z),
                     new Point3(-size.X, -size.Y, size.Z),
-                }),
+                }, _c),
 
                 // Back Side
                 new Triangle3( new Point3[] {
                     new Point3(-size.X, -size.Y, size.Z),
                     new Point3(-size.X, size.Y, size.Z),
                     new Point3(size.X, -size.Y, size.Z),
-                }),
+                }, _c),
                 new Triangle3( new Point3[] {
                     new Point3(size.X, size.Y, size.Z),
                     new Point3(-size.X, size.Y, size.Z),
                     new Point3(size.X, -size.Y, size.Z),
-                }),
+                }, _c),
 
                 // Top Side
                 new Triangle3( new Point3[] {
                     new Point3(-size.X, -size.Y, -size.Z),
                     new Point3(-size.X, -size.Y, size.Z),
                     new Point3(size.X, -size.Y, -size.Z),
-                }),
+                }, _c),
                 new Triangle3( new Point3[] {
                     new Point3(size.X, -size.Y, size.Z),
                     new Point3(-size.X, -size.Y, size.Z),
                     new Point3(size.X, -size.Y, -size.Z),
-                }),
+                }, _c),
                 
                 // Bottom Side
                 new Triangle3( new Point3[] {
                     new Point3(-size.X, size.Y, -size.Z),
                     new Point3(-size.X, size.Y, size.Z),
                     new Point3(size.X, size.Y, -size.Z),
-                }),
+                }, _c),
                 new Triangle3( new Point3[] {
                     new Point3(size.X, size.Y, size.Z),
                     new Point3(-size.X, size.Y, size.Z),
                     new Point3(size.X, size.Y, -size.Z),
-                }),
+                }, _c),
             }, location, rotation));
         }
 
-        void newCylinder(Point3 location, Point3 size, float columns, Point3 rotation)
+        void newCylinder(Point3 location, Point3 size, float columns, Point3 rotation, Color _c)
         {
             // Create a list of temp triangles
             List<Triangle3> tempTris = new List<Triangle3>();
@@ -251,13 +285,13 @@ namespace Three_Dimensional_V3
                     new Point3(Convert.ToSingle(Math.Cos(i / rad2Deg) * size.X), -size.Y, Convert.ToSingle(Math.Sin(i / rad2Deg) * size.Z)),
                     new Point3(Convert.ToSingle(Math.Cos((i + columnAdder) / rad2Deg) * size.X), -size.Y, Convert.ToSingle(Math.Sin((i + columnAdder) / rad2Deg) * size.Z)),
                     new Point3(Convert.ToSingle(Math.Cos((i + columnAdder) / rad2Deg) * size.X), size.Y, Convert.ToSingle(Math.Sin((i + columnAdder) / rad2Deg) * size.Z)),
-                }));
+                }, _c));
                 tempTris.Add(new Triangle3(new Point3[]
                 {
                     new Point3(Convert.ToSingle(Math.Cos(i / rad2Deg) * size.X), size.Y, Convert.ToSingle(Math.Sin(i / rad2Deg) * size.Z)),
                     new Point3(Convert.ToSingle(Math.Cos(i / rad2Deg) * size.X), -size.Y, Convert.ToSingle(Math.Sin(i / rad2Deg) * size.Z)),
                     new Point3(Convert.ToSingle(Math.Cos((i + columnAdder) / rad2Deg) * size.X), size.Y, Convert.ToSingle(Math.Sin((i + columnAdder) / rad2Deg) * size.Z)),
-                }));
+                }, _c));
 
                 // Top circle
                 tempTris.Add(new Triangle3(new Point3[]
@@ -265,7 +299,7 @@ namespace Three_Dimensional_V3
                     new Point3(Convert.ToSingle(Math.Cos(i / rad2Deg) * size.X), size.Y, Convert.ToSingle(Math.Sin(i / rad2Deg) * size.Z)),
                     new Point3(Convert.ToSingle(Math.Cos((i + columnAdder) / rad2Deg) * size.X), size.Y, Convert.ToSingle(Math.Sin((i + columnAdder) / rad2Deg) * size.Z)),
                     new Point3(0, size.Y, 0),
-                }));
+                }, _c));
 
                 // Bottom circle
                 tempTris.Add(new Triangle3(new Point3[]
@@ -273,13 +307,13 @@ namespace Three_Dimensional_V3
                     new Point3(Convert.ToSingle(Math.Cos(i / rad2Deg) * size.X), -size.Y, Convert.ToSingle(Math.Sin(i / rad2Deg) * size.Z)),
                     new Point3(Convert.ToSingle(Math.Cos((i + columnAdder) / rad2Deg) * size.X), -size.Y, Convert.ToSingle(Math.Sin((i + columnAdder) / rad2Deg) * size.Z)),
                     new Point3(0, -size.Y, 0),
-                }));
+                }, _c));
             }
 
             objs.Add(new Object(tempTris, location, rotation));
         }
 
-        void newCone(Point3 location, float radius, float height, float columns, Point3 rotation)
+        void newCone(Point3 location, float radius, float height, float columns, Point3 rotation, Color _c)
         {
             // Create a list of temp triangles
             List<Triangle3> tempTris = new List<Triangle3>();
@@ -298,7 +332,7 @@ namespace Three_Dimensional_V3
                     new Point3(Convert.ToSingle(Math.Cos(i / rad2Deg) * radius), height, Convert.ToSingle(Math.Sin(i / rad2Deg) * radius)),
                     new Point3(Convert.ToSingle(Math.Cos((i + columnAdder) / rad2Deg) * radius), height, Convert.ToSingle(Math.Sin((i + columnAdder) / rad2Deg) * radius)),
                     new Point3(0, -height, 0),
-                }));
+                }, _c));
 
                 // Bottom circle
                 tempTris.Add(new Triangle3(new Point3[]
@@ -306,13 +340,13 @@ namespace Three_Dimensional_V3
                     new Point3(Convert.ToSingle(Math.Cos(i / rad2Deg) * radius), height, Convert.ToSingle(Math.Sin(i / rad2Deg) * radius)),
                     new Point3(Convert.ToSingle(Math.Cos((i + columnAdder) / rad2Deg) * radius), height, Convert.ToSingle(Math.Sin((i + columnAdder) / rad2Deg) * radius)),
                     new Point3(0, height, 0),
-                }));
+                }, _c));
             }
 
             objs.Add(new Object(tempTris, location, rotation));
         }
 
-        void newPlane(Point3 location, PointF size, Point3 rotation)
+        void newPlane(Point3 location, PointF size, Point3 rotation, Color _c)
         {
             objs.Add(new Object(new List<Triangle3>()
             {
@@ -320,12 +354,12 @@ namespace Three_Dimensional_V3
                     new Point3(-size.X, 0, -size.Y) ,
                     new Point3(-size.X, 0, size.Y) ,
                     new Point3(size.X, 0, -size.Y) 
-                }),
+                }, _c),
                 new Triangle3(new Point3[]{
                     new Point3(size.X, 0, size.Y) ,
                     new Point3(-size.X, 0, size.Y) ,
                     new Point3(size.X, 0, -size.Y)
-                }),
+                }, _c),
             }, location, rotation));
         }
 
@@ -409,18 +443,23 @@ namespace Three_Dimensional_V3
                 framesSinceLastSecond = 0;
             }
 
+            // Millis differences
+            lastMillis = DateTime.Now.Millisecond;
+            lastSecond = DateTime.Now.Second;
+
             // Setup objects
             objs.Clear();
             Form1.maxid = 0;
 
             // Add objects
             
-            //newCylinder(new Point3(150, -1, 1000), new Point3(150, 100, 50), 36, new Point3(0, 0, 0));
-            newSphere(new Point3(450, -1, 1000), 100, 20, 40);
-            //newCube(new Point3(-450, -1, 1000), new Point3(100, 100, 100), new Point3(0, 0, 0));
-            //newCone(new Point3(-150, -1, 1000), 50, 100, 12, new Point3(0, 0, 0));
-            //newPlane(new Point3(0, 100, 1000), new PointF(1000, 1000), new Point3(0, 0, 0));
+            newCylinder(new Point3(150, -100, 1000), new Point3(150, 100, 50), 36, new Point3(test, test, test), Color.Yellow);
+            newSphere(new Point3(450, -100, 1000), 100, 8, 16, Color.Blue);
+            newCube(new Point3(-450, -100, 1000), new Point3(100, 100, 100), new Point3(test, test, test), Color.LimeGreen);
+            newCone(new Point3(-150, -100, 1000), 50, 100, 12, new Point3(test, test, test), Color.Purple);
+            newPlane(new Point3(0, 100, 1000), new PointF(2000, 2000), new Point3(0, 0, 0), Color.Red);
 
+            objCreateTime = getMillisSinceLast();
 
             // Camera movement and rotation
             if (keys[87])
@@ -470,6 +509,8 @@ namespace Three_Dimensional_V3
             test++;
             // Sort objects
             SetupZBuffer();
+
+            zBufferTime = getMillisSinceLast();
             this.Refresh();
         }
 
@@ -478,26 +519,21 @@ namespace Three_Dimensional_V3
         {
             e.Graphics.TranslateTransform(res.X / 2, res.Y / 2);
 
-
             // Draw the triangles
             int i = 0;
+            int h = 0;
             foreach (SortingTriangle3 tri in trisToSort)
             {
                 i++;
-                if (tri.needsToDraw)
-                {
-                    if (tri.tri.ShouldBeOnScreen(camera, tri.obj, res))
-                    {
-                        // Color.FromArgb(Convert.ToInt16(i / 2), Convert.ToInt16(i / 20), Convert.ToInt16(i)))
-                        e.Graphics.FillPolygon(new SolidBrush(Color.FromArgb(Convert.ToInt16(i * (255f / trisToSort.Count) / 2f), Convert.ToInt16(i * (255f / trisToSort.Count) / 100f), Convert.ToInt16(i * (255f / trisToSort.Count)))), tri.tri.PointsOnScreen(camera, tri.obj, res));
-                        //e.Graphics.DrawPolygon(new Pen(Color.Black, 2), tri.tri.PointsOnScreen(camera, tri.obj, res, i / 12));
-                    }
-                }
+                e.Graphics.FillPolygon(new SolidBrush(tri.tri.mainColor), tri.tri.PointsOnScreen(camera, tri.obj, res));
+                //e.Graphics.DrawPolygon(new Pen(Color.Black, 2), ps);
+                h++;
             }
             e.Graphics.ResetTransform();
 
             // Get FPS
-            e.Graphics.DrawString($"FPS: {fps}", DefaultFont, new SolidBrush(Color.Black), new PointF(10, 10));
+            drawTime = getMillisSinceLast();
+            e.Graphics.DrawString($"FPS: {fps}\nTris: {h}/{i}\nCreate Time: {objCreateTime}ms\nZ Buffer Time: {zBufferTime}ms\nDraw Time: {drawTime}ms", DefaultFont, new SolidBrush(Color.Black), new PointF(10, 10));
         }
 
         /** KEYBOARD **/

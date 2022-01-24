@@ -13,14 +13,17 @@ namespace Three_Dimensional_V3
 
         public Point3[] oldPoints = new Point3[3];
 
+        public Color mainColor;
+
         public float saidZ;
         public bool isKill = false;
 
         public bool isCutTriangle = false;
 
-        public Triangle3(Point3[] _points)
+        public Triangle3(Point3[] _points, Color _mainColor)
         {
             points = _points;
+            mainColor = _mainColor;
         }
 
         // Cutoff Triangle
@@ -63,7 +66,7 @@ namespace Three_Dimensional_V3
                     // Triangle 1
                     _tris.Add(new SortingTriangle3(new Triangle3(new Point3[]{
                         new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f)
-                    }), _obj));
+                    }, mainColor), _obj));
                     _tris[_tris.Count - 1].tri.isCutTriangle = true;
                     _tris[_tris.Count - 1].tri.oldPoints = new Point3[3]
                     {
@@ -75,7 +78,7 @@ namespace Three_Dimensional_V3
                     // Triangle 2
                     _tris.Add(new SortingTriangle3(new Triangle3(new Point3[]{
                         new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f)
-                    }), _obj));
+                    }, mainColor), _obj));
                     _tris[_tris.Count - 1].tri.isCutTriangle = true;
                     _tris[_tris.Count - 1].tri.oldPoints = new Point3[3]
                     {
@@ -89,7 +92,7 @@ namespace Three_Dimensional_V3
                     // Triangle 1
                     _tris.Add(new SortingTriangle3(new Triangle3(new Point3[]{
                         new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f)
-                    }), _obj));
+                    }, mainColor), _obj));
                     _tris[_tris.Count - 1].tri.isCutTriangle = true;
                     _tris[_tris.Count - 1].tri.oldPoints = new Point3[3]
                     {
@@ -101,7 +104,7 @@ namespace Three_Dimensional_V3
                     // Triangle 2
                     _tris.Add(new SortingTriangle3(new Triangle3(new Point3[]{
                         new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f)
-                    }), _obj));
+                    }, mainColor), _obj));
                     _tris[_tris.Count - 1].tri.isCutTriangle = true;
                     _tris[_tris.Count - 1].tri.oldPoints = new Point3[3]
                     {
@@ -132,7 +135,7 @@ namespace Three_Dimensional_V3
                 {
                     _tris.Add(new SortingTriangle3(new Triangle3(new Point3[]{
                         new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f)
-                    }), _obj));
+                    }, mainColor), _obj));
                     _tris[_tris.Count - 1].tri.isCutTriangle = true;
                     _tris[_tris.Count - 1].tri.oldPoints = new Point3[3]
                     {
@@ -142,7 +145,7 @@ namespace Three_Dimensional_V3
                     };
                     _tris.Add(new SortingTriangle3(new Triangle3(new Point3[]{
                         new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f)
-                    }), _obj));
+                    }, mainColor), _obj));
                     _tris[_tris.Count - 1].tri.isCutTriangle = true;
                     _tris[_tris.Count - 1].tri.oldPoints = new Point3[3]
                     {
@@ -155,7 +158,7 @@ namespace Three_Dimensional_V3
                 {
                     _tris.Add(new SortingTriangle3(new Triangle3(new Point3[]{
                         new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f)
-                    }), _obj));
+                    }, mainColor), _obj));
                     _tris[_tris.Count - 1].tri.isCutTriangle = true;
                     _tris[_tris.Count - 1].tri.oldPoints = new Point3[3]
                     {
@@ -166,7 +169,7 @@ namespace Three_Dimensional_V3
 
                     _tris.Add(new SortingTriangle3(new Triangle3(new Point3[]{
                         new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f)
-                    }), _obj));
+                    }, mainColor), _obj));
                     _tris[_tris.Count - 1].tri.isCutTriangle = true;
                     _tris[_tris.Count - 1].tri.oldPoints = new Point3[3]
                     {
@@ -198,7 +201,7 @@ namespace Three_Dimensional_V3
                 {
                     _tris.Add(new SortingTriangle3(new Triangle3(new Point3[]{
                         new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f)
-                    }), _obj));
+                    }, mainColor), _obj));
                     _tris[_tris.Count - 1].tri.isCutTriangle = true;
                     _tris[_tris.Count - 1].tri.oldPoints = new Point3[3]
                     {
@@ -209,7 +212,7 @@ namespace Three_Dimensional_V3
 
                     _tris.Add(new SortingTriangle3(new Triangle3(new Point3[]{
                         new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f)
-                    }), _obj));
+                    }, mainColor), _obj));
                     _tris[_tris.Count - 1].tri.isCutTriangle = true;
                     _tris[_tris.Count - 1].tri.oldPoints = new Point3[3]
                     {
@@ -223,7 +226,7 @@ namespace Three_Dimensional_V3
 
                     _tris.Add(new SortingTriangle3(new Triangle3(new Point3[]{
                         new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f)
-                    }), _obj));
+                    }, mainColor), _obj));
                     _tris[_tris.Count - 1].tri.isCutTriangle = true;
                     _tris[_tris.Count - 1].tri.oldPoints = new Point3[3]
                     {
@@ -234,7 +237,7 @@ namespace Three_Dimensional_V3
 
                     _tris.Add(new SortingTriangle3(new Triangle3(new Point3[]{
                         new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f)
-                    }), _obj));
+                    }, mainColor), _obj));
                     _tris[_tris.Count - 1].tri.isCutTriangle = true;
                     _tris[_tris.Count - 1].tri.oldPoints = new Point3[3]
                     {
@@ -269,7 +272,7 @@ namespace Three_Dimensional_V3
 
                 _tris.Add(new SortingTriangle3(new Triangle3(new Point3[]{
                         new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f)
-                    }), _obj));
+                    }, mainColor), _obj));
                 _tris[_tris.Count - 1].tri.isCutTriangle = true;
                 _tris[_tris.Count - 1].tri.oldPoints = new Point3[3]
                 {
@@ -302,7 +305,7 @@ namespace Three_Dimensional_V3
 
                 _tris.Add(new SortingTriangle3(new Triangle3(new Point3[]{
                         new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f)
-                    }), _obj));
+                    }, mainColor), _obj));
                 _tris[_tris.Count - 1].tri.isCutTriangle = true;
                 _tris[_tris.Count - 1].tri.oldPoints = new Point3[3]
                 {
@@ -334,7 +337,7 @@ namespace Three_Dimensional_V3
 
                 _tris.Add(new SortingTriangle3(new Triangle3(new Point3[]{
                         new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f),new Point3(0f, 0f, 0f)
-                    }), _obj));
+                    }, mainColor), _obj));
                 _tris[_tris.Count - 1].tri.isCutTriangle = true;
                 _tris[_tris.Count - 1].tri.oldPoints = new Point3[3]
                 {
@@ -378,14 +381,14 @@ namespace Three_Dimensional_V3
                         new Point3(avgX, avgY, avgZ),
                         new Point3(points[0].X, points[0].Y, points[0].Z),
                         new Point3(points[1].X, points[1].Y, points[1].Z)
-                        }));
+                        }, mainColor));
                         _tris[_tris.Count - 1].TriangleMaxDist(maxdist, _tris);
                         _tris.Add(new Triangle3(new Point3[]
                         {
                         new Point3(avgX, avgY, avgZ),
                         new Point3(points[0].X, points[0].Y, points[0].Z),
                         new Point3(points[2].X, points[2].Y, points[2].Z)
-                        }));
+                        }, mainColor));
                         _tris[_tris.Count - 1].TriangleMaxDist(maxdist, _tris);
                     }
                 }
@@ -402,14 +405,14 @@ namespace Three_Dimensional_V3
                         new Point3(avgX, avgY, avgZ),
                         new Point3(points[0].X, points[0].Y, points[0].Z),
                         new Point3(points[1].X, points[1].Y, points[1].Z)
-                        }));
+                        }, mainColor));
                         _tris[_tris.Count - 1].TriangleMaxDist(maxdist, _tris);
                         _tris.Add(new Triangle3(new Point3[]
                         {
                         new Point3(avgX, avgY, avgZ),
                         new Point3(points[0].X, points[0].Y, points[0].Z),
                         new Point3(points[2].X, points[2].Y, points[2].Z)
-                        }));
+                        }, mainColor));
                         _tris[_tris.Count - 1].TriangleMaxDist(maxdist, _tris);
                     }
                 }
@@ -426,14 +429,14 @@ namespace Three_Dimensional_V3
                         new Point3(avgX, avgY, avgZ),
                         new Point3(points[2].X, points[2].Y, points[2].Z),
                         new Point3(points[1].X, points[1].Y, points[1].Z)
-                        }));
+                        }, mainColor));
                         _tris[_tris.Count - 1].TriangleMaxDist(maxdist, _tris);
                         _tris.Add(new Triangle3(new Point3[]
                         {
                         new Point3(avgX, avgY, avgZ),
                         new Point3(points[2].X, points[2].Y, points[2].Z),
                         new Point3(points[0].X, points[0].Y, points[0].Z)
-                        }));
+                        }, mainColor));
                         _tris[_tris.Count - 1].TriangleMaxDist(maxdist, _tris);
                     }
                 }
@@ -552,9 +555,10 @@ namespace Three_Dimensional_V3
 
             float toRad = Convert.ToSingle(180 / Math.PI);
             float Z0 = Convert.ToSingle((_resolution.X / 2) / Math.Tan((_cam.fov / 2) / toRad));
-            if(isCutTriangle == false)
+            PointF[] thePoints = new PointF[3];
+            if (isCutTriangle == false)
             {
-                cutoffTriangle(Z0 /3, _tris, _obj, debugI);
+                cutoffTriangle(2, _tris, _obj, debugI);
             }
             saidZ = 0;
             for (int i = 0; i < oldPoints.Length; i++)
@@ -563,8 +567,45 @@ namespace Three_Dimensional_V3
                 float theZ = oldPoints[i].Z - Z0;
                 float theX = oldPoints[i].X * (Z0 / (Z0 + theZ));
                 float theY = oldPoints[i].Y * (Z0 / (Z0 + theZ));
+                thePoints[i] = new PointF(theX, theY);
                 //saidZ += Convert.ToSingle(theZ);
                 saidZ += Convert.ToSingle(Math.Sqrt(Math.Pow(oldPoints[i].X, 2) + Math.Pow(oldPoints[i].Y, 2) + Math.Pow(oldPoints[i].Z, 2)));
+                
+            }
+            // Are all points behind the camera
+            if (oldPoints[0].Z < 0 && oldPoints[1].Z < 0 && oldPoints[2].Z < 0)
+            {
+                isKill = true;
+            }
+
+            // Are all points a greater distance away from the camera than the maximum render distance
+            if (Math.Sqrt((Math.Pow(oldPoints[0].X, 2) + Math.Pow(oldPoints[0].Y, 2) + Math.Pow(oldPoints[0].Z, 2))) >= _cam.maximumRenderDistance && Math.Sqrt((Math.Pow(oldPoints[1].X, 2) + Math.Pow(oldPoints[1].Y, 2) + Math.Pow(oldPoints[1].Z, 2))) >= _cam.maximumRenderDistance && Math.Sqrt((Math.Pow(oldPoints[2].X, 2) + Math.Pow(oldPoints[2].Y, 2) + Math.Pow(oldPoints[2].Z, 2))) >= _cam.maximumRenderDistance)
+            {
+                isKill = true;
+            }
+
+            // Are all points off left of the screen
+            if (thePoints[0].X < -_resolution.X / 1.9 && thePoints[1].X < -_resolution.X / 1.9 && thePoints[2].X < -_resolution.X / 1.9)
+            {
+                isKill = true;
+            }
+
+            // Are all points off right of the screen
+            if (thePoints[0].X > _resolution.X / 1.9 && thePoints[1].X > _resolution.X / 1.9 && thePoints[2].X > _resolution.X / 1.9)
+            {
+                isKill = true;
+            }
+
+            // Are all points off up of the screen
+            if (thePoints[0].Y < -_resolution.Y / 1.9 && thePoints[1].Y < -_resolution.Y / 1.9 && thePoints[2].Y < -_resolution.Y / 1.9)
+            {
+                isKill = true;
+            }
+
+            // Are all points off down of the screen
+            if (thePoints[0].Y > _resolution.Y / 1.9 && thePoints[1].Y > _resolution.Y / 1.9 && thePoints[2].Y > _resolution.Y / 1.9)
+            {
+                isKill = true;
             }
             saidZ /= 3;
         }
@@ -583,6 +624,7 @@ namespace Three_Dimensional_V3
             float Z0 = Convert.ToSingle((_resolution.X / 2) / Math.Tan((_cam.fov / 2) / toRad));
 
             Point3 theAveragePosition = new Point3(0, 0, 0);
+            PointF[] thePoints = new PointF[3];
 
             saidZ = 0;
             for (int i = 0; i < points.Length; i++)
@@ -608,18 +650,58 @@ namespace Three_Dimensional_V3
                     theY = -30000;
                 }
 
+                thePoints[i] = new PointF(theX, theY);
+
                 theAveragePosition.X += theX;
                 theAveragePosition.Y += theY;
                 theAveragePosition.Z += oldPoints[i].Z;
                 ////Console.WriteLine($"Z of point {i} is {oldPoints[i].Z}");
-                if (oldPoints[i].Z > 0)
+                /*if (oldPoints[i].Z > 0)
                 {
-                    if (theX > -_resolution.X / 1.9 && theX < _resolution.X / 1.9 && theY > -_resolution.Y / 1.9 && theY < _resolution.Y / 1.9 && Math.Sqrt((Math.Pow(oldPoints[i].X, 2) + Math.Pow(oldPoints[i].Y, 2) + Math.Pow(oldPoints[i].Z, 2))) < _cam.maximumRenderDistance)
+                    if (theX > -_resolution.X / 1.9 && theX < _resolution.X / 1.9 && theY > -_resolution.Y / 1.9 && theY < _resolution.Y / 1.9)
                     {
                         return true;
                     }
-                }
+                }*/
             }
+
+            // Are all points behind the camera
+            /*
+            if (oldPoints[0].Z < 0 && oldPoints[1].Z < 0 && oldPoints[2].Z < 0) {
+                return false;
+            }
+
+            // Are all points a greater distance away from the camera than the maximum render distance
+            if (Math.Sqrt((Math.Pow(oldPoints[0].X, 2) + Math.Pow(oldPoints[0].Y, 2) + Math.Pow(oldPoints[0].Z, 2))) >= _cam.maximumRenderDistance && Math.Sqrt((Math.Pow(oldPoints[1].X, 2) + Math.Pow(oldPoints[1].Y, 2) + Math.Pow(oldPoints[1].Z, 2))) >= _cam.maximumRenderDistance && Math.Sqrt((Math.Pow(oldPoints[2].X, 2) + Math.Pow(oldPoints[2].Y, 2) + Math.Pow(oldPoints[2].Z, 2))) >= _cam.maximumRenderDistance)
+            {
+                return false;
+            }
+
+            // Are all points off left of the screen
+            if(thePoints[0].X < -_resolution.X / 1.9 && thePoints[1].X < -_resolution.X / 1.9 && thePoints[2].X < -_resolution.X / 1.9)
+            {
+                return false;
+            }
+
+            // Are all points off right of the screen
+            if (thePoints[0].X > _resolution.X / 1.9 && thePoints[1].X > _resolution.X / 1.9 && thePoints[2].X > _resolution.X / 1.9)
+            {
+                return false;
+            }
+
+            // Are all points off up of the screen
+            if (thePoints[0].Y < -_resolution.Y / 1.9 && thePoints[1].Y < -_resolution.Y / 1.9 && thePoints[2].Y < -_resolution.Y / 1.9)
+            {
+                return false;
+            }
+
+            // Are all points off down of the screen
+            if (thePoints[0].Y > _resolution.Y / 1.9 && thePoints[1].Y > _resolution.Y / 1.9 && thePoints[2].Y > _resolution.Y / 1.9)
+            {
+                return false;
+            }*/
+
+
             //theAveragePosition.X /= 3;
             //theAveragePosition.Y /= 3;
             //theAveragePosition.Z /= 3;
@@ -633,7 +715,7 @@ namespace Three_Dimensional_V3
             //    }
             //}
 
-            return false;
+            return true;
         }
 
         public PointF[] PointsOnScreen(Camera _cam, Object _obj, PointF _resolution)
