@@ -14,57 +14,36 @@ namespace Three_Dimensional_V3
     public partial class MainScreen : UserControl
     {
         /**
-         * -- Three-Dimensional V3 -- 
+         * -- Three-Dimensional V3 / Dimensional Escape -- 
          * Made by Ted Angus
-         * Created: 2021/11/29 - 2022/1/13
+         * Created: 2022/1/24 - 2022/1/??
          * 
          * -- TO DO --
-         * ~ Proper Z-Layering 
-         * ~ [PRIORITY] Object rotations
-         * ~ Completely in function
-         * ~ Convert this program to a reference
+         * Monday:
+         * ~ Test movement
+         * ~ Gravity
+         * ~ Collisions to floors
+         * ~ Collisions to walls
+         * ~ Collisions to slopes?
+         * ~ First person
+         * ~ Laser gun shooting and model
          * 
-         * -- BUGS --
-         * ~ [PRIORITY] Triangle disappears with all points off screen even though a line still crosses the screen
-         * ~ Horrible issues at higher FOVS (Probably will never fix)
+         * Tuesday:
+         * ~ Enemy testing, and collisions
+         * ~ Killing enemies
+         * ~ HP, Energy, and mission systems
+         * ~ Start level creation
+         * ~ Final boss level?
+         * ~ Enemy designs
+         *
+         * Wednesday:
+         * ~ Better graphics
+         * ~ Final boss mechanics
+         * ~ Win screen and menu screen
+         * ~ Polishing and bug fixes
          * 
-         * -- VERSION HISTORY --
-         * 
-         * Version v3.6: (Long awaited!)
-         * - Better Z-Layering (By Splitting triangles)
-         * - You can go through shapes now, looks pretty cool
-         * - Changed the color engine to revert back to closeness by all layers
-         * - Added the Z Buffer into it's own function
-         * 
-         * - Bug Fixed: Triangle covers entire screen when right behind camera
-         * 
-         * Version v3.5:
-         * - Cones
-         * - Added size to cylinders
-         * - Plane function
-         * - Thoughts of fixing issues
-         * 
-         * Version v3.4:
-         * - Designated Cube Function
-         * - Cylinders!
-         * 
-         * Version v3.3:
-         * - Spheres
-         * - Fixed "Triangles may flash when appearing for one frame before being sorted with the rest"
-         * 
-         * Version v3.2:
-         * - Y axis Rotations completed
-         * - All rotations work now
-         * - Stable for once
-         * - Layering issues may still exist though unfortunately
-         * 
-         * Version v3.1:
-         * - I don't know at this point
-         * - Rotation XZ works, rotation Y does not work
-         * 
-         * Version v3.0.0:
-         * ~ Very basic WORKING 3d stuff for once!
-         * ~ Basic layering
+         * -- Everything that's finished --
+         * ~ Create the game file itself
          * 
         */
 
@@ -74,7 +53,7 @@ namespace Three_Dimensional_V3
         Random randGen = new Random();
 
         /** CAMERA RELATED VARIABLES **/
-        Camera camera = new Camera(70, new Point3(0, 0, 0), new PointF(0, 0), 3000); // Camera
+        Camera camera = new Camera(70, new Point3(0, 0, -100), new PointF(0, 0), 3000); // Camera
         bool[] keys = new bool[256];
 
         /** FPS RELATED VARIABLES **/
@@ -123,6 +102,9 @@ namespace Three_Dimensional_V3
         List<Object> objs = new List<Object>();
         List<SortingTriangle3> trisToSort = new List<SortingTriangle3>();
         List<float> objInts = new List<float>();
+
+        /** GAME RELATED VARIABLES **/
+        Point3 pos = new Point3(0, 0, 0);
 
         int test = 0;
 
@@ -430,6 +412,7 @@ namespace Three_Dimensional_V3
                 keys[i] = false;
             }
         }
+
         /** UPDATE METHOD **/
         private void frameUpdate_Tick(object sender, EventArgs e)
         {
@@ -452,36 +435,38 @@ namespace Three_Dimensional_V3
             Form1.maxid = 0;
 
             // Add objects
-            
-            // comment
-            newCylinder(new Point3(150, -100, 1000), new Point3(150, 100, 50), 36, new Point3(test, test, test), Color.Yellow);
-            newSphere(new Point3(450, -100, 1000), 100, 8, 16, Color.Blue);
-            newCube(new Point3(-450, -100, 1000), new Point3(100, 100, 100), new Point3(test, test, test), Color.LimeGreen);
-            newCone(new Point3(-150, -100, 1000), 50, 100, 12, new Point3(test, test, test), Color.Purple);
-            newPlane(new Point3(0, 100, 1000), new PointF(2000, 2000), new Point3(0, 0, 0), Color.Red);
+            //newCylinder(new Point3(150, -100, 1000), new Point3(150, 100, 50), 36, new Point3(test, test, test), Color.Yellow);
+            newSphere(new Point3(pos.X, pos.Y-70, pos.Z), 60, 8, 16, Color.LimeGreen);
+            newCube(new Point3(pos.X, pos.Y-5, pos.Z), new Point3(30, 100, 30), new Point3(0, 0, 0), Color.LimeGreen);
+            //newCone(new Point3(-150, -100, 1000), 50, 100, 12, new Point3(test, test, test), Color.Purple);
+            newPlane(new Point3(0, 100, 1000), new PointF(2000, 2000), new Point3(0, 0, 0), Color.Gray);
 
             objCreateTime = getMillisSinceLast();
 
             // Camera movement and rotation
             if (keys[87])
             {
-                camera.pos.X += Convert.ToSingle(Math.Sin(camera.direction.X) * 5);
-                camera.pos.Z += Convert.ToSingle(Math.Cos(camera.direction.X) * 5);
+                //camera.pos.X += Convert.ToSingle(Math.Sin(camera.direction.X) * 5);
+                //camera.pos.Z += Convert.ToSingle(Math.Cos(camera.direction.X) * 5);
+                pos.Z += 15;
             }
             if (keys[65])
             {
-                camera.pos.X += Convert.ToSingle(Math.Sin(camera.direction.X - (90 / (180 / Math.PI))) * 5);
-                camera.pos.Z += Convert.ToSingle(Math.Cos(camera.direction.X - (90 / (180 / Math.PI))) * 5);
+                //camera.pos.X += Convert.ToSingle(Math.Sin(camera.direction.X - (90 / (180 / Math.PI))) * 5);
+                //camera.pos.Z += Convert.ToSingle(Math.Cos(camera.direction.X - (90 / (180 / Math.PI))) * 5);
+                pos.X -= 15;
             }
             if (keys[68])
             {
-                camera.pos.X += Convert.ToSingle(Math.Sin(camera.direction.X + (90 / (180 / Math.PI))) * 5);
-                camera.pos.Z += Convert.ToSingle(Math.Cos(camera.direction.X + (90 / (180 / Math.PI))) * 5);
+                //camera.pos.X += Convert.ToSingle(Math.Sin(camera.direction.X + (90 / (180 / Math.PI))) * 5);
+                //camera.pos.Z += Convert.ToSingle(Math.Cos(camera.direction.X + (90 / (180 / Math.PI))) * 5);
+                pos.X += 15;
             }
             if (keys[83])
             {
-                camera.pos.X -= Convert.ToSingle(Math.Sin(camera.direction.X) * 5);
-                camera.pos.Z -= Convert.ToSingle(Math.Cos(camera.direction.X) * 5);
+                //camera.pos.X -= Convert.ToSingle(Math.Sin(camera.direction.X) * 5);
+                //camera.pos.Z -= Convert.ToSingle(Math.Cos(camera.direction.X) * 5);
+                pos.Z -= 15;
             }
             if (keys[16])
             {
@@ -493,19 +478,19 @@ namespace Three_Dimensional_V3
             }
             if (keys[37])
             {
-                camera.direction.X += Convert.ToSingle(1 / (180 / Math.PI));
+                camera.direction.X -= Convert.ToSingle(3 / (180 / Math.PI));
             }
             if (keys[39])
             {
-                camera.direction.X -= Convert.ToSingle(1 / (180 / Math.PI));
+                camera.direction.X += Convert.ToSingle(3 / (180 / Math.PI));
             }
             if (keys[38])
             {
-                camera.direction.Y += Convert.ToSingle(1 / (180 / Math.PI));
+                camera.direction.Y += Convert.ToSingle(3 / (180 / Math.PI));
             }
             if (keys[40])
             {
-                camera.direction.Y -= Convert.ToSingle(1 / (180 / Math.PI));
+                camera.direction.Y -= Convert.ToSingle(3 / (180 / Math.PI));
             }
             test++;
             // Sort objects
@@ -534,7 +519,7 @@ namespace Three_Dimensional_V3
 
             // Get FPS
             drawTime = getMillisSinceLast();
-            e.Graphics.DrawString($"FPS: {fps}\nTris: {h}/{i}\nCreate Time: {objCreateTime}ms\nZ Buffer Time: {zBufferTime}ms\nDraw Time: {drawTime}ms", DefaultFont, new SolidBrush(Color.Black), new PointF(10, 10));
+            //e.Graphics.DrawString($"FPS: {fps}\nTris: {h}/{i}\nCreate Time: {objCreateTime}ms\nZ Buffer Time: {zBufferTime}ms\nDraw Time: {drawTime}ms", DefaultFont, new SolidBrush(Color.Black), new PointF(10, 10));
         }
 
         /** KEYBOARD **/
