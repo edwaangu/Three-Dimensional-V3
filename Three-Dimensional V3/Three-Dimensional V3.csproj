@@ -60,6 +60,7 @@
       <DependentUpon>MainScreen.cs</DependentUpon>
     </Compile>
     <Compile Include="Object.cs" />
+    <Compile Include="Player.cs" />
     <Compile Include="Point3.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

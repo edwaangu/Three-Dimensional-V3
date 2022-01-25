@@ -53,7 +53,7 @@ namespace Three_Dimensional_V3
         Random randGen = new Random();
 
         /** CAMERA RELATED VARIABLES **/
-        Camera camera = new Camera(70, new Point3(0, 0, -100), new PointF(0, 0), 3000); // Camera
+        Camera camera = new Camera(70, new Point3(0, 0, -300), new PointF(0, 0), 3000); // Camera
         bool[] keys = new bool[256];
 
         /** FPS RELATED VARIABLES **/
@@ -104,7 +104,7 @@ namespace Three_Dimensional_V3
         List<float> objInts = new List<float>();
 
         /** GAME RELATED VARIABLES **/
-        Point3 pos = new Point3(0, 0, 0);
+        Player p = new Player(new Point3(0, -15, 0));
 
         int test = 0;
 
@@ -436,8 +436,8 @@ namespace Three_Dimensional_V3
 
             // Add objects
             //newCylinder(new Point3(150, -100, 1000), new Point3(150, 100, 50), 36, new Point3(test, test, test), Color.Yellow);
-            newSphere(new Point3(pos.X, pos.Y-70, pos.Z), 60, 8, 16, Color.LimeGreen);
-            newCube(new Point3(pos.X, pos.Y-5, pos.Z), new Point3(30, 100, 30), new Point3(0, 0, 0), Color.LimeGreen);
+            //newSphere(new Point3(p.pos.X, p.pos.Y-70, p.pos.Z), 60, 8, 16, Color.LimeGreen);
+            newCube(p.pos, p.size, new Point3(0, 0, 0), Color.LimeGreen);
             //newCone(new Point3(-150, -100, 1000), 50, 100, 12, new Point3(test, test, test), Color.Purple);
             newPlane(new Point3(0, 100, 1000), new PointF(2000, 2000), new Point3(0, 0, 0), Color.Gray);
 
@@ -448,26 +448,33 @@ namespace Three_Dimensional_V3
             {
                 //camera.pos.X += Convert.ToSingle(Math.Sin(camera.direction.X) * 5);
                 //camera.pos.Z += Convert.ToSingle(Math.Cos(camera.direction.X) * 5);
-                pos.Z += 15;
+                p.velocity.Z += p.hasJumped ? 1.5f : 4;
             }
             if (keys[65])
             {
                 //camera.pos.X += Convert.ToSingle(Math.Sin(camera.direction.X - (90 / (180 / Math.PI))) * 5);
                 //camera.pos.Z += Convert.ToSingle(Math.Cos(camera.direction.X - (90 / (180 / Math.PI))) * 5);
-                pos.X -= 15;
+                p.velocity.X -= p.hasJumped ? 1.5f : 4;
             }
             if (keys[68])
             {
                 //camera.pos.X += Convert.ToSingle(Math.Sin(camera.direction.X + (90 / (180 / Math.PI))) * 5);
                 //camera.pos.Z += Convert.ToSingle(Math.Cos(camera.direction.X + (90 / (180 / Math.PI))) * 5);
-                pos.X += 15;
+                p.velocity.X += p.hasJumped ? 1.5f : 4;
             }
             if (keys[83])
             {
                 //camera.pos.X -= Convert.ToSingle(Math.Sin(camera.direction.X) * 5);
                 //camera.pos.Z -= Convert.ToSingle(Math.Cos(camera.direction.X) * 5);
-                pos.Z -= 15;
+                p.velocity.Z -= p.hasJumped ? 1.5f : 4;
             }
+            if (keys[32] && p.hasJumped == false)
+            {
+                p.hasJumped = true;
+                p.velocity.Y = -10;
+
+            }
+            p.addVelocities();
             if (keys[16])
             {
                 camera.pos.Y += 5;
