@@ -19,16 +19,12 @@ namespace Three_Dimensional_V3
          * Created: 2022/1/24 - 2022/1/??
          * 
          * -- TO DO --
-         * Monday:
-         * ~ Test movement
-         * ~ Gravity
+         * 
+         * Tuesday:
          * ~ Collisions to floors
          * ~ Collisions to walls
          * ~ Collisions to slopes?
-         * ~ First person
          * ~ Laser gun shooting and model
-         * 
-         * Tuesday:
          * ~ Enemy testing, and collisions
          * ~ Killing enemies
          * ~ HP, Energy, and mission systems
@@ -44,6 +40,9 @@ namespace Three_Dimensional_V3
          * 
          * -- Everything that's finished --
          * ~ Create the game file itself
+         * ~ Test movement
+         * ~ Gravity
+         * ~ First person
          * 
         */
 
@@ -105,6 +104,8 @@ namespace Three_Dimensional_V3
 
         /** GAME RELATED VARIABLES **/
         Player p = new Player(new Point3(0, -15, 0));
+
+        List<Collision> cols = new List<Collision>();
 
         int test = 0;
 
@@ -439,49 +440,63 @@ namespace Three_Dimensional_V3
             //newSphere(new Point3(p.pos.X, p.pos.Y-70, p.pos.Z), 60, 8, 16, Color.LimeGreen);
             newCube(p.pos, p.size, new Point3(0, 0, 0), Color.LimeGreen);
             //newCone(new Point3(-150, -100, 1000), 50, 100, 12, new Point3(test, test, test), Color.Purple);
-            newPlane(new Point3(0, 100, 1000), new PointF(2000, 2000), new Point3(0, 0, 0), Color.Gray);
+            newCube(new Point3(150, -100, 700), new Point3(100, 100, 100), new Point3(0, 0, 0), Color.DarkSlateGray);
+            newPlane(new Point3(0, 0, 1000), new PointF(2000, 2000), new Point3(0, 0, 0), Color.Gray);
+
+            // Add collision objects
+            cols.Clear();
+            cols.Add(new Collision(new Point3(0, 0, 1000), new Point3(2000, 0, 2000), "plane"));
+            cols.Add(new Collision(new Point3(150, -100, 700), new Point3(100, 100, 100), "cube"));
+
+
 
             objCreateTime = getMillisSinceLast();
 
-            // Camera movement and rotation
+            // Movement and rotation
             if (keys[87])
             {
-                //camera.pos.X += Convert.ToSingle(Math.Sin(camera.direction.X) * 5);
-                //camera.pos.Z += Convert.ToSingle(Math.Cos(camera.direction.X) * 5);
-                p.velocity.Z += p.hasJumped ? 1.5f : 4;
+                p.velocity.X += Convert.ToSingle(Math.Sin(camera.direction.X) * (p.hasJumped ? 1.5f : 4));
+                p.velocity.Z += Convert.ToSingle(Math.Cos(camera.direction.X) * (p.hasJumped ? 1.5f : 4));
             }
             if (keys[65])
             {
-                //camera.pos.X += Convert.ToSingle(Math.Sin(camera.direction.X - (90 / (180 / Math.PI))) * 5);
-                //camera.pos.Z += Convert.ToSingle(Math.Cos(camera.direction.X - (90 / (180 / Math.PI))) * 5);
-                p.velocity.X -= p.hasJumped ? 1.5f : 4;
+                p.velocity.X += Convert.ToSingle(Math.Sin(camera.direction.X - (90 / (180 / Math.PI))) * (p.hasJumped ? 1.5f : 4));
+                p.velocity.Z += Convert.ToSingle(Math.Cos(camera.direction.X - (90 / (180 / Math.PI))) * (p.hasJumped ? 1.5f : 4));
             }
             if (keys[68])
             {
-                //camera.pos.X += Convert.ToSingle(Math.Sin(camera.direction.X + (90 / (180 / Math.PI))) * 5);
-                //camera.pos.Z += Convert.ToSingle(Math.Cos(camera.direction.X + (90 / (180 / Math.PI))) * 5);
-                p.velocity.X += p.hasJumped ? 1.5f : 4;
+                p.velocity.X += Convert.ToSingle(Math.Sin(camera.direction.X + (90 / (180 / Math.PI))) * (p.hasJumped ? 1.5f : 4));
+                p.velocity.Z += Convert.ToSingle(Math.Cos(camera.direction.X + (90 / (180 / Math.PI))) * (p.hasJumped ? 1.5f : 4));
             }
             if (keys[83])
             {
-                //camera.pos.X -= Convert.ToSingle(Math.Sin(camera.direction.X) * 5);
-                //camera.pos.Z -= Convert.ToSingle(Math.Cos(camera.direction.X) * 5);
-                p.velocity.Z -= p.hasJumped ? 1.5f : 4;
+                p.velocity.X -= Convert.ToSingle(Math.Sin(camera.direction.X) * (p.hasJumped ? 1.5f : 4));
+                p.velocity.Z -= Convert.ToSingle(Math.Cos(camera.direction.X) * (p.hasJumped ? 1.5f : 4));
             }
             if (keys[32] && p.hasJumped == false)
             {
                 p.hasJumped = true;
-                p.velocity.Y = -10;
-
+                p.velocity.Y = -15;
             }
+
             p.addVelocities();
+
+            foreach (Collision col in cols)
+            {
+                col.checkCollision(p);
+            }
+
+
+            //camera.pos.X = p.pos.X;
+            camera.pos.Y = p.pos.Y;
+            //camera.pos.Z = p.pos.Z;
             if (keys[16])
             {
-                camera.pos.Y += 5;
+                //camera.pos.Y += 5;
             }
             if (keys[32])
             {
-                camera.pos.Y -= 5;
+                //camera.pos.Y -= 5;
             }
             if (keys[37])
             {

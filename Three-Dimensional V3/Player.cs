@@ -28,12 +28,6 @@ namespace Three_Dimensional_V3
 
             velocity.Y += 9.8f / 60f;
 
-            if(pos.Y > -15)
-            {
-                pos.Y = -15;
-                velocity.Y = 0;
-                hasJumped = false;
-            }
 
             if(hasJumped == false)
             {
