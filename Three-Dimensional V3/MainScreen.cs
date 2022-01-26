@@ -585,7 +585,7 @@ namespace Three_Dimensional_V3
                         b.isKill = true;
                     }
                 }
-                if(Math.Sqrt(Math.Pow(b.pos.X - p.pos.X, 2) + Math.Pow(b.pos.Y - p.pos.Y, 2) + Math.Pow(b.pos.Z - p.pos.Z, 2)) > 2000)
+                if(Math.Sqrt(Math.Pow(b.pos.X - p.pos.X, 2) + Math.Pow(b.pos.Y - p.pos.Y, 2) + Math.Pow(b.pos.Z - p.pos.Z, 2)) > camera.maximumRenderDistance)
                 {
                     b.isKill = true;
                 }
