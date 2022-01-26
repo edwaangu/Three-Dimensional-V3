@@ -21,20 +21,15 @@ namespace Three_Dimensional_V3
          * -- TO DO --
          * 
          * Tuesday:
-         * ~ Collisions to floors
-         * ~ Collisions to walls
-         * ~ Collisions to slopes?
-         * ~ Laser gun shooting and model
          * ~ Enemy testing, and collisions
          * ~ Killing enemies
-         * ~ HP, Energy, and mission systems
+         * ~ HP, Energy
+         * ~ Floating text?
          * ~ Start level creation
-         * ~ Final boss level?
-         * ~ Enemy designs
+         * ~ Final boss?
          *
          * Wednesday:
          * ~ Better graphics
-         * ~ Final boss mechanics
          * ~ Win screen and menu screen
          * ~ Polishing and bug fixes
          * 
@@ -43,6 +38,9 @@ namespace Three_Dimensional_V3
          * ~ Test movement
          * ~ Gravity
          * ~ First person
+         * ~ Collisions to floors
+         * ~ Collisions to walls
+         * ~ Laser gun shooting
          * 
         */
 
@@ -50,9 +48,11 @@ namespace Three_Dimensional_V3
         /** MAIN VARIABLES **/
         PointF res; // Resolution
         Random randGen = new Random();
+        Point prevMouse = new Point(0, 0);
+        PointF cursorIncrease = new PointF(0, 0);
 
         /** CAMERA RELATED VARIABLES **/
-        Camera camera = new Camera(70, new Point3(0, 0, -300), new PointF(0, 0), 3000); // Camera
+        Camera camera = new Camera(90, new Point3(0, 0, -300), new PointF(0, 0), 3000); // Camera
         bool[] keys = new bool[256];
 
         /** FPS RELATED VARIABLES **/
@@ -106,6 +106,10 @@ namespace Three_Dimensional_V3
         Player p = new Player(new Point3(0, -15, 0));
 
         List<Collision> cols = new List<Collision>();
+        List<Bullet> bullets = new List<Bullet>();
+        List<Enemy> enemies = new List<Enemy>();
+
+        int bulletCooldown = 20;
 
         int test = 0;
 
@@ -412,11 +416,26 @@ namespace Three_Dimensional_V3
             {
                 keys[i] = false;
             }
+
+            enemies.Add(new Enemy(new Point3(-500, -200, -1500), "crawler"));
+
+            // Set position
         }
 
         /** UPDATE METHOD **/
         private void frameUpdate_Tick(object sender, EventArgs e)
         {
+            Form f = this.FindForm();
+            prevMouse = new Point(0 + Cursor.Position.X, 0 + Cursor.Position.Y);
+            Cursor.Position = new Point(f.DesktopLocation.X + this.Width / 2, f.DesktopLocation.Y + this.Height / 2);
+            Cursor.Hide();
+
+            // Bullet counter
+            if (bulletCooldown > 0)
+            {
+                bulletCooldown--;
+            }
+
             // Framerate
             framesSinceLastSecond++;
             accurateSec = DateTime.Now.Second;
@@ -438,15 +457,38 @@ namespace Three_Dimensional_V3
             // Add objects
             //newCylinder(new Point3(150, -100, 1000), new Point3(150, 100, 50), 36, new Point3(test, test, test), Color.Yellow);
             //newSphere(new Point3(p.pos.X, p.pos.Y-70, p.pos.Z), 60, 8, 16, Color.LimeGreen);
-            newCube(p.pos, p.size, new Point3(0, 0, 0), Color.LimeGreen);
+            //newCube(p.pos, p.size, new Point3(0, 0, 0), Color.LimeGreen);
             //newCone(new Point3(-150, -100, 1000), 50, 100, 12, new Point3(test, test, test), Color.Purple);
-            newCube(new Point3(150, -100, 700), new Point3(100, 100, 100), new Point3(0, 0, 0), Color.DarkSlateGray);
+            newCube(new Point3(150, -300, 700), new Point3(100, 100, 100), new Point3(0, 0, 0), Color.DarkSlateGray);
             newPlane(new Point3(0, 0, 1000), new PointF(2000, 2000), new Point3(0, 0, 0), Color.Gray);
+
+            foreach(Bullet b in bullets)
+            {
+                newSphere(b.pos, 10, 6, 12, Color.LimeGreen);
+                b.Move();
+                if(Math.Sqrt(Math.Pow(b.pos.X - p.pos.X, 2) + Math.Pow(b.pos.Y - p.pos.Y, 2) + Math.Pow(b.pos.Z - p.pos.Z, 2)) > 2000)
+                {
+                    b.isKill = true;
+                }
+            }
+
+            foreach (Enemy enemy in enemies)
+            {
+                newCube(enemy.pos, enemy.size, new Point3(0, 0, 0), enemy.type == "crawler" ? Color.DarkRed : Color.DarkTurquoise);
+            }
+
+            for (int i = bullets.Count-1;i >= 0;i--)
+            {
+                if (bullets[i].isKill)
+                {
+                    bullets.RemoveAt(i);
+                }
+            }
 
             // Add collision objects
             cols.Clear();
             cols.Add(new Collision(new Point3(0, 0, 1000), new Point3(2000, 0, 2000), "plane"));
-            cols.Add(new Collision(new Point3(150, -100, 700), new Point3(100, 100, 100), "cube"));
+            cols.Add(new Collision(new Point3(150, -300, 700), new Point3(100, 100, 100), "cube"));
 
 
 
@@ -476,9 +518,17 @@ namespace Three_Dimensional_V3
             if (keys[32] && p.hasJumped == false)
             {
                 p.hasJumped = true;
-                p.velocity.Y = -15;
+                p.velocity.Y = -20;
             }
 
+            // Bullet shooting
+            if(keys[90] && bulletCooldown <= 0)
+            {
+                bullets.Add(new Bullet(new Point3(p.pos.X + 0, p.pos.Y + 0, p.pos.Z + 0), camera.direction));
+                bulletCooldown = 20;
+            }
+
+            // Add velocities to the player
             p.addVelocities();
 
             foreach (Collision col in cols)
@@ -486,10 +536,16 @@ namespace Three_Dimensional_V3
                 col.checkCollision(p);
             }
 
+            // Check collisions and movement for enemies
+            foreach(Enemy enemy in enemies)
+            {
+                enemy.Move(cols, p);
+            }
 
-            //camera.pos.X = p.pos.X;
-            camera.pos.Y = p.pos.Y;
-            //camera.pos.Z = p.pos.Z;
+
+            camera.pos.X = p.pos.X;
+            camera.pos.Y = p.pos.Y - (p.size.Y / 2);
+            camera.pos.Z = p.pos.Z;
             if (keys[16])
             {
                 //camera.pos.Y += 5;
@@ -498,22 +554,34 @@ namespace Three_Dimensional_V3
             {
                 //camera.pos.Y -= 5;
             }
+
+            if (test > 2)
+            {
+                cursorIncrease.X -= Convert.ToSingle((Cursor.Position.X - prevMouse.X) / (180f / Math.PI) / 7f);
+                cursorIncrease.Y += Convert.ToSingle((Cursor.Position.Y - prevMouse.Y) / (180f / Math.PI) / 7f);
+            }
+            camera.direction.X += cursorIncrease.X;
+            camera.direction.Y += cursorIncrease.Y;
+            cursorIncrease.X *= 0.6f;
+            cursorIncrease.Y *= 0.6f;
+
             if (keys[37])
             {
-                camera.direction.X -= Convert.ToSingle(3 / (180 / Math.PI));
+                //camera.direction.X -= Convert.ToSingle(4 / (180 / Math.PI));
             }
             if (keys[39])
             {
-                camera.direction.X += Convert.ToSingle(3 / (180 / Math.PI));
+                //camera.direction.X += Convert.ToSingle(4 / (180 / Math.PI));
             }
             if (keys[38])
             {
-                camera.direction.Y += Convert.ToSingle(3 / (180 / Math.PI));
+                //camera.direction.Y += Convert.ToSingle(4 / (180 / Math.PI));
             }
             if (keys[40])
             {
-                camera.direction.Y -= Convert.ToSingle(3 / (180 / Math.PI));
+                //camera.direction.Y -= Convert.ToSingle(4 / (180 / Math.PI));
             }
+
             test++;
             // Sort objects
             SetupZBuffer();
@@ -549,6 +617,11 @@ namespace Three_Dimensional_V3
         {
             // Update value of key array to true
             keys[e.KeyValue] = true;
+            if(e.KeyCode == Keys.Escape)
+            {
+                Cursor.Show();
+                Application.Exit();
+            }
         }
 
         private void MainScreen_KeyUp(object sender, KeyEventArgs e)

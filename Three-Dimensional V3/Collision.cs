@@ -9,8 +9,8 @@ namespace Three_Dimensional_V3
 {
     internal class Collision
     {
-        string type; // "plane, cube, slope"
-        Point3 pos, size;
+        public string type; // "plane, cube, slope"
+        public Point3 pos, size;
         public Collision(Point3 _pos, Point3 _size, string _type)
         {
             pos = _pos;
@@ -20,12 +20,6 @@ namespace Three_Dimensional_V3
 
         public bool colBetween3DRecs(Rectangle3 r1, Rectangle3 r2)
         {
-
-            //RectangleF r1XZRec = new RectangleF(r1Pos.X - r1Size.X, r1Pos.Z - r1Size.Z, r1Size.X * 2, r1Size.Z * 2);
-            //RectangleF r2XZRec = new RectangleF(r2Pos.X - r2Size.X, r2Pos.Z - r2Size.Z, r2Size.X * 2, r2Size.Z * 2);
-
-            //RectangleF r1XYRec = new RectangleF(r1Pos.X - r1Size.X, r1Pos.Y - r1Size.Y, r1Size.X * 2, r1Size.Y * 2);
-            //RectangleF r2XYRec = new RectangleF(r2Pos.X - r2Size.X, r2Pos.Y - r2Size.Y, r2Size.X * 2, r2Size.Y * 2);
             RectangleF r1XZRec = new RectangleF(r1.pos.X, r1.pos.Z, r1.size.X, r1.size.Z);
             RectangleF r2XZRec = new RectangleF(r2.pos.X, r2.pos.Z, r2.size.X, r2.size.Z);
             RectangleF r1XYRec = new RectangleF(r1.pos.X, r1.pos.Y, r1.size.X, r1.size.Y);
@@ -66,46 +60,48 @@ namespace Three_Dimensional_V3
                 Rectangle3 colRecPZ = new Rectangle3(new Point3(pos.X, pos.Y, pos.Z + size.Z - size.Z / 8), new Point3(size.X, size.Y, size.Z / 8));
                 Rectangle3 colRecNZ = new Rectangle3(new Point3(pos.X, pos.Y, pos.Z - size.Z + size.Z / 8), new Point3(size.X, size.Y, size.Z / 8));
 
-
                 // Bottom of player hits top of cube
-                /*
-                if (colBetween3DRecs(new Point3(_p.pos.X, _p.pos.Y + _p.size.Y - _p.size.Y / 8, _p.pos.Z), new Point3(_p.size.X, _p.size.Y / 8, _p.size.Z), new Point3(pos.X, pos.Y - size.Y / 2, pos.Z), new Point3(size.X, size.Y / 2, size.Z)))
+                if (colBetween3DRecs(pRecPY, colRecNY))
                 {
                     _p.pos.Y = pos.Y - size.Y - _p.size.Y;
                     _p.velocity.Y = 0;
                     _p.hasJumped = false;
                 }
+
                 // Top of player hits bottom of cube
-                else if (colBetween3DRecs(new Point3(_p.pos.X, _p.pos.Y - _p.size.Y + _p.size.Y / 8, _p.pos.Z), new Point3(_p.size.X, _p.size.Y / 8, _p.size.Z), new Point3(pos.X, pos.Y + size.Y - size.Y / 4, pos.Z), new Point3(size.X, size.Y / 4, size.Z)))
+                else if (colBetween3DRecs(pRecNY, colRecPY))
                 {
                     _p.pos.Y = pos.Y + size.Y + _p.size.Y;
                     _p.velocity.Y = 0;
                 }
 
-                // Negative X side of player hits Positive X side of cube
-                if (colBetween3DRecs(new Point3(_p.pos.X - _p.size.X + _p.size.X / 8, _p.pos.Y, _p.pos.Z), new Point3(_p.size.X / 8, _p.size.Y, _p.size.Z), new Point3(pos.X + size.X / 2, pos.Y, pos.Z), new Point3(size.X / 2, size.Y, size.Z)))
+                else
                 {
-                    _p.pos.X = pos.X + size.X + _p.size.X;
+                    // Neg X of player hits Pos X of cube
+                    if (colBetween3DRecs(pRecNX, colRecPX))
+                    {
+                        _p.pos.X = pos.X + size.X + _p.size.X;
+                    }
+
+                    // Pos X of player hits Neg X of cube
+                    if (colBetween3DRecs(pRecPX, colRecNX))
+                    {
+                        _p.pos.X = pos.X - size.X - _p.size.X;
+                    }
+
+
+                    // Neg Z of player hits Pos Z of cube
+                    if (colBetween3DRecs(pRecNZ, colRecPZ))
+                    {
+                        _p.pos.Z = pos.Z + size.Z + _p.size.Z;
+                    }
+
+                    // Pos Z of player hits Neg Z of cube
+                    if (colBetween3DRecs(pRecPZ, colRecNZ))
+                    {
+                        _p.pos.Z = pos.Z - size.Z - _p.size.Z;
+                    }
                 }
-
-                // Positive X side of player hits Negative X side of cube
-                if (colBetween3DRecs(new Point3(_p.pos.X + _p.size.X - _p.size.X / 8, _p.pos.Y, _p.pos.Z), new Point3(_p.size.X / 8, _p.size.Y, _p.size.Z), new Point3(pos.X - size.X / 2, pos.Y, pos.Z), new Point3(size.X / 2, size.Y, size.Z)))
-                {
-                    _p.pos.X = pos.X - size.X - _p.size.X;
-                }
-
-
-                // Negative Z side of player hits Positive Z side of cube
-                if (colBetween3DRecs(new Point3(_p.pos.X, _p.pos.Y, _p.pos.Z - _p.size.Z + _p.size.Z / 8), new Point3(_p.size.X, _p.size.Y, _p.size.Z / 8), new Point3(pos.X, pos.Y, pos.Z + size.Z / 2), new Point3(size.X, size.Y, size.Z / 2)))
-                {
-                    _p.pos.Z = pos.Z + size.Z + _p.size.Z;
-                }
-
-                // Positive Z side of player hits negative Z side of cube
-                if (colBetween3DRecs(new Point3(_p.pos.X, _p.pos.Y, _p.pos.Z + _p.size.Z - _p.size.Z / 8), new Point3(_p.size.X, _p.size.Y, _p.size.Z / 8), new Point3(pos.X, pos.Y, pos.Z - size.Z / 2), new Point3(size.X, size.Y, size.Z / 2)))
-                {
-                    _p.pos.Z = pos.Z - size.Z - _p.size.Z;
-                }*/
             }
         }
 

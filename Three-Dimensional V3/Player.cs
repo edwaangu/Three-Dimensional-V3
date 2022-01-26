@@ -26,7 +26,7 @@ namespace Three_Dimensional_V3
             pos.Y += velocity.Y;
             pos.Z += velocity.Z;
 
-            velocity.Y += 9.8f / 60f;
+            velocity.Y += 30f / 60f;
 
 
             if(hasJumped == false)
