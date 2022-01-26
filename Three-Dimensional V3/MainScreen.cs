@@ -16,18 +16,23 @@ namespace Three_Dimensional_V3
         /**
          * -- Three-Dimensional V3 / Dimensional Escape -- 
          * Made by Ted Angus
-         * Created: 2022/1/24 - 2022/1/??
+         * Created: 2022/1/24 - 2022/1/26
+         * 
+         * -- CONTROLS --
+         * Esc - End program
+         * W - Forward
+         * A/D - Strafe Left/Right
+         * S - Backwards
+         * Mouse movement - Turns camera
+         * Z - Shoot
          * 
          * -- TO DO --
          * 
-         * Tuesday:
          * ~ Killing enemies & enemies that shoot
          * ~ HP, Energy
          * ~ Floating text?
          * ~ Start level creation
          * ~ Final boss?
-         *
-         * Wednesday:
          * ~ Better graphics
          * ~ Win screen and menu screen
          * ~ Polishing and bug fixes
@@ -46,6 +51,9 @@ namespace Three_Dimensional_V3
          * 
         */
 
+        /** VARIABLES YOU CAN EDIT FOR VIEWING PLEASURE: **/
+        int mode = 0; //0 = the level, 1 = checkerboard
+        int triangleSplitMax = 1200; // Lower this if you are experiencing large layering issues, but raise it if you are experiencing fps issues
 
         /** MAIN VARIABLES **/
         PointF res; // Resolution
@@ -115,6 +123,9 @@ namespace Three_Dimensional_V3
         int bulletCooldown = 20;
 
         int test = 0;
+        int movePlatformA = 0;
+        public int movePlatformAMode = 0;
+        int platformMoveStop = 0;
 
         /** SHAPE MAKERS **/
         void newSphere(Point3 location, float radius, float rows, float columns, Color _c)
@@ -178,7 +189,7 @@ namespace Three_Dimensional_V3
             objs.Add(new Object(tempTris, location, new Point3(0, 0, 0)));
         }
 
-        void newCube(Point3 location, Point3 size, Point3 rotation, Color _c, bool missingBottom = false, bool missingTop = false, bool missingLeft = false, bool missingRight = false, bool missingFront = false, bool missingBack = false)
+        void newCube(Point3 location, Point3 size, Point3 rotation, Color _c, bool missingBottom = false, bool missingTop = false, bool missingLeft = false, bool missingRight = false, bool missingFront = false, bool missingBack = false, bool isMovingPlatform = false, int movePlatformType = 0)
         {
             List<Triangle3> temp = new List<Triangle3>();
             if (!missingFront)
@@ -271,6 +282,8 @@ namespace Three_Dimensional_V3
             }
             // Create 12 triangles, 2 for each side
             objs.Add(new Object(temp, location, rotation));
+
+            cols.Add(new Collision(location, size, "cube", _isMovePlatform: isMovingPlatform, _movePlatformType:movePlatformType));
         }
 
         void newCylinder(Point3 location, Point3 size, float columns, Point3 rotation, Color _c)
@@ -385,7 +398,7 @@ namespace Three_Dimensional_V3
                 totalTris += obj.tris.Count;
                 for (int j = 0;j < oldTrisCount;j ++)
                 {
-                    obj.tris[j].TriangleMaxDist(500, obj.tris);
+                    obj.tris[j].TriangleMaxDist(triangleSplitMax, obj.tris);
                 }
                 for(int i = obj.tris.Count-1; i >= 0; i--)
                 {
@@ -434,14 +447,27 @@ namespace Three_Dimensional_V3
 
             SetupZBuffer();
 
+
+            // Setup keys
             for(int i = 0;i < keys.Length;i++)
             {
                 keys[i] = false;
             }
 
-            enemies.Add(new Enemy(new Point3(0, -200, 0), "crawler"));
+            // Add enemies
+            if (mode == 1)
+            {
+                enemies.Add(new Enemy(new Point3(0, -200, 0), "crawler"));
+            }
+            else
+            {
+                enemies.Add(new Enemy(new Point3(500, -1700, 15000), "crawler"));
+                enemies.Add(new Enemy(new Point3(-500, -1700, 15000), "crawler"));
+                enemies.Add(new Enemy(new Point3(1000, -1700, 15000), "crawler"));
+                enemies.Add(new Enemy(new Point3(-1000, -1700, 15000), "crawler"));
 
-            // Set position
+            }
+
         }
 
         /** UPDATE METHOD **/
@@ -478,24 +504,69 @@ namespace Three_Dimensional_V3
 
             // Add objects
             cols.Clear();
-            //newCylinder(new Point3(150, -100, 1000), new Point3(150, 100, 50), 36, new Point3(test, test, test), Color.Yellow);
-            //newSphere(new Point3(p.pos.X, p.pos.Y-70, p.pos.Z), 60, 8, 16, Color.LimeGreen);
-            //newCube(p.pos, p.size, new Point3(0, 0, 0), Color.LimeGreen);
-            //newCone(new Point3(-150, -100, 1000), 50, 100, 12, new Point3(test, test, test), Color.Purple);
-            //newCube(new Point3(150, -300, 700), new Point3(100, 100, 100), new Point3(0, 0, 0), Color.DarkSlateGray, missingBottom: true, missingRight: true, missingFront: true, missingBack: true);
-            //newPlane(new Point3(0, 0, 0), new PointF(2000, 2000), new Point3(0, 0, 0), Color.Gray);
-            //newPlane(new Point3(0, -50, -4100), new PointF(2000, 2000), new Point3(0, 0, 0), Color.Red);
 
-            // Add collision objects
-            int k = 0;
-            for(int i = Convert.ToInt16(p.pos.X/400f)-8;i <= Convert.ToInt16(p.pos.X / 400f) + 8;i++)
+            if (mode == 1)
             {
-                for(int j = Convert.ToInt16(p.pos.Z / 400f) - 8;j <= Convert.ToInt16(p.pos.Z / 400f) + 8; j++)
+                for (int i = Convert.ToInt16(p.pos.X / 400f) - 8; i <= Convert.ToInt16(p.pos.X / 400f) + 8; i++)
                 {
-                    newCube(new Point3(i * 400, 100, j * 400), new Point3(200, 0, 200), new Point3(0, 0, 0), (i + j) % 2 == 0 ? Color.Black : Color.LightSlateGray, missingBottom: true, missingFront: true, missingLeft: true, missingBack: true, missingRight: true);
-                    cols.Add(new Collision(new Point3(i * 400, 100, j * 400), new Point3(200, 0, 200), "cube"));
-                    k++;
+                    for (int j = Convert.ToInt16(p.pos.Z / 400f) - 8; j <= Convert.ToInt16(p.pos.Z / 400f) + 8; j++)
+                    {
+                        newCube(new Point3(i * 400, 100 + (i+j) * 100, j * 400), new Point3(200, 50, 200), new Point3(0, 0, 0), (i + j) % 2 == 0 ? Color.Black : Color.LightSlateGray, missingBottom: true, missingFront: true, missingLeft: true);
+
+                    }
                 }
+            }
+            else
+            {
+                // Base
+                newCube(new Point3(0, 150, 3000), new Point3(1000, 150, 4000), new Point3(0, 0, 0), Color.Gray, missingBottom: true, missingLeft: true, missingRight: true, missingFront: true, missingBack: true);
+
+                // Platforms
+                newCube(new Point3(0, -200, 2000), new Point3(200, 200, 200), new Point3(0, 0, 0), Color.DarkSlateGray, missingBottom: true);
+                newCube(new Point3(200, -500, 3000), new Point3(200, 100, 200), new Point3(0, 0, 0), Color.DarkSlateGray, missingBottom: true);
+                newCube(new Point3(-200, -800, 4000), new Point3(200, 100, 200), new Point3(0, 0, 0), Color.DarkSlateGray, missingBottom: true);
+                newCube(new Point3(-400, -1100, 5000), new Point3(200, 100, 200), new Point3(0, 0, 0), Color.DarkSlateGray, missingBottom: true);
+                newCube(new Point3(300, -1100, 6000), new Point3(200, 100, 200), new Point3(0, 0, 0), Color.DarkSlateGray, missingBottom: true);
+
+                // Ledge
+                newCube(new Point3(0, -750, 8000), new Point3(1000, 750, 1000), new Point3(0, 0, 0), Color.Gray, missingBottom: true, missingLeft: true, missingRight: true, missingBack: true);
+
+                // Moving platforms
+                if (platformMoveStop <= 0)
+                {
+                    movePlatformA += movePlatformAMode == 2 ? -5 : 5;
+                }
+                if(movePlatformA > 1500 && movePlatformAMode == 0)
+                {
+                    movePlatformAMode = 1;
+                    platformMoveStop = 60;
+                }
+                if (movePlatformA < 0 && movePlatformAMode == 2)
+                {
+                    movePlatformAMode = 3;
+                    platformMoveStop = 60;
+                }
+
+                if(movePlatformAMode == 1 || movePlatformAMode == 3)
+                {
+                    platformMoveStop--;
+                    if(platformMoveStop <= 0)
+                    {
+                        movePlatformAMode++;
+                        if(movePlatformAMode >= 4)
+                        {
+                            movePlatformAMode = 0;
+                        }
+                    }
+                }
+
+                newCube(new Point3(0, -1500, 12500 - movePlatformA), new Point3(200, 100, 200), new Point3(0, 0, 0), Color.DarkSlateGray, missingBottom: true, isMovingPlatform: true, movePlatformType: 1);
+                newCube(new Point3(400, -1500, 9500 + movePlatformA), new Point3(200, 100, 200), new Point3(0, 0, 0), Color.DarkSlateGray, missingBottom: true, isMovingPlatform: true, movePlatformType: 0);
+
+
+                // Ledge 2
+                newCube(new Point3(0, -1500, 15000), new Point3(2000, 150, 2000), new Point3(0, 0, 0), Color.SaddleBrown, missingBottom: true, missingLeft: true, missingRight: true, missingBack: true);
+
             }
 
             //cols.Add(new Collision(new Point3(0, 0, 0), new Point3(2000, 0, 2000), "plane"));
@@ -504,8 +575,16 @@ namespace Three_Dimensional_V3
 
             foreach (Bullet b in bullets)
             {
-                newSphere(b.pos, 10, 6, 12, Color.LimeGreen);
+                newSphere(b.pos, 10, 4, 8, Color.LimeGreen);
                 b.Move();
+                foreach(Enemy enemy in enemies)
+                {
+                    if(b.pos.X > enemy.pos.X - enemy.size.X && b.pos.X < enemy.pos.X + enemy.size.X && b.pos.Y > enemy.pos.Y - enemy.size.Y && b.pos.Y < enemy.pos.Y + enemy.size.Y && b.pos.Z > enemy.pos.Z - enemy.size.Z && b.pos.Z < enemy.pos.Z + enemy.size.Z)
+                    {
+                        enemy.health--;
+                        b.isKill = true;
+                    }
+                }
                 if(Math.Sqrt(Math.Pow(b.pos.X - p.pos.X, 2) + Math.Pow(b.pos.Y - p.pos.Y, 2) + Math.Pow(b.pos.Z - p.pos.Z, 2)) > 2000)
                 {
                     b.isKill = true;
@@ -515,6 +594,8 @@ namespace Three_Dimensional_V3
             foreach (Enemy enemy in enemies)
             {
                 newCube(new Point3(enemy.pos.X, enemy.pos.Y-5, enemy.pos.Z), enemy.size, new Point3(0, 0, 0), enemy.type == "crawler" ? Color.DarkRed : Color.DarkTurquoise);
+
+                newCube(new Point3(enemy.pos.X, enemy.pos.Y - 120, enemy.pos.Z), new Point3(100 * (enemy.health / 5f), 20, 20), new Point3(Convert.ToSingle(-camera.direction.X * (180 / Math.PI)), 0, 0), Color.Green);
             }
 
             for (int i = bullets.Count-1;i >= 0;i--)
@@ -522,6 +603,14 @@ namespace Three_Dimensional_V3
                 if (bullets[i].isKill)
                 {
                     bullets.RemoveAt(i);
+                }
+            }
+
+            for (int i = enemies.Count - 1; i >= 0; i--)
+            {
+                if (enemies[i].health <= 0)
+                {
+                    enemies.RemoveAt(i);
                 }
             }
 
@@ -569,13 +658,16 @@ namespace Three_Dimensional_V3
 
             foreach (Collision col in cols)
             {
-                col.checkCollision(p);
+                col.checkCollision(p, col.isMovePlatform ? movePlatformAMode : -1);
             }
 
             // Check collisions and movement for enemies
             foreach(Enemy enemy in enemies)
             {
-                enemy.Move(cols, p);
+                if (Math.Sqrt(Math.Pow(p.pos.X - enemy.pos.X, 2) + Math.Pow(p.pos.Y - enemy.pos.Y, 2) + Math.Pow(p.pos.Z - enemy.pos.Z, 2)) < camera.maximumRenderDistance/1.3f)
+                {
+                    enemy.Move(cols, p);
+                }
             }
 
 
@@ -601,21 +693,15 @@ namespace Three_Dimensional_V3
             cursorIncrease.X *= 0.6f;
             cursorIncrease.Y *= 0.6f;
 
-            if (keys[37])
+            if(p.pos.Y > 3500)
             {
-                //camera.direction.X -= Convert.ToSingle(4 / (180 / Math.PI));
+                p.pos = new Point3(0, -3500, 0);
+                p.velocity.Y = 0;
             }
-            if (keys[39])
+
+            if(p.velocity.Y > 30)
             {
-                //camera.direction.X += Convert.ToSingle(4 / (180 / Math.PI));
-            }
-            if (keys[38])
-            {
-                //camera.direction.Y += Convert.ToSingle(4 / (180 / Math.PI));
-            }
-            if (keys[40])
-            {
-                //camera.direction.Y -= Convert.ToSingle(4 / (180 / Math.PI));
+                p.velocity.Y = 30;
             }
 
             test++;

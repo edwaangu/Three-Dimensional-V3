@@ -14,6 +14,7 @@ namespace Three_Dimensional_V3
         public Point3 size = new Point3(80, 80, 80);
         public string type; //shooter, crawler
         public bool hasJumped = false;
+        public int health = 5;
 
 
         public Enemy(Point3 _pos, string _type)

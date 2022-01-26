@@ -12,6 +12,7 @@ namespace Three_Dimensional_V3
 {
     public partial class Form1 : Form
     {
+        /// The information about this program is located in MainScreen.cs
         public static int maxid = 0;
         public Form1()
         {

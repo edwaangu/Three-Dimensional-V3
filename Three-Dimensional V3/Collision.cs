@@ -11,11 +11,15 @@ namespace Three_Dimensional_V3
     {
         public string type; // "plane, cube, slope"
         public Point3 pos, size;
-        public Collision(Point3 _pos, Point3 _size, string _type)
+        public bool isMovePlatform;
+        public int movePlatformType; // 0 PZ, 1 NZ, 2 PX, 3 NX
+        public Collision(Point3 _pos, Point3 _size, string _type, bool _isMovePlatform = false, int _movePlatformType = 0)
         {
             pos = _pos;
             size = _size;
             type = _type;
+            isMovePlatform = _isMovePlatform;
+            movePlatformType = _movePlatformType;
         }
 
         public bool colBetween3DRecs(Rectangle3 r1, Rectangle3 r2)
@@ -29,7 +33,7 @@ namespace Three_Dimensional_V3
             return r1XZRec.IntersectsWith(r2XZRec) && r1XYRec.IntersectsWith(r2XYRec);
         }
 
-        public void checkCollision(Player _p)
+        public void checkCollision(Player _p, int movePlatformMode = -1)
         {
             if(type == "plane")
             {
@@ -66,6 +70,53 @@ namespace Three_Dimensional_V3
                     _p.pos.Y = pos.Y - size.Y - _p.size.Y;
                     _p.velocity.Y = 0;
                     _p.hasJumped = false;
+                    if (isMovePlatform)
+                    {
+                        if (movePlatformType == 0)
+                        {
+                            if (movePlatformMode == 0)
+                            {
+                                _p.pos.Z += 10;
+                            }
+                            if (movePlatformMode == 2)
+                            {
+                                _p.pos.Z -= 10;
+                            }
+                        }
+                        if (movePlatformType == 1)
+                        {
+                            if (movePlatformMode == 0)
+                            {
+                                _p.pos.Z -= 10;
+                            }
+                            if (movePlatformMode == 2)
+                            {
+                                _p.pos.Z += 10;
+                            }
+                        }
+                        if (movePlatformType == 2)
+                        {
+                            if (movePlatformMode == 0)
+                            {
+                                _p.pos.X += 10;
+                            }
+                            if (movePlatformMode == 2)
+                            {
+                                _p.pos.X -= 10;
+                            }
+                        }
+                        if (movePlatformType == 3)
+                        {
+                            if (movePlatformMode == 0)
+                            {
+                                _p.pos.X -= 10;
+                            }
+                            if (movePlatformMode == 2)
+                            {
+                                _p.pos.X += 10;
+                            }
+                        }
+                    }
                 }
 
                 // Top of player hits bottom of cube
