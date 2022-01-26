@@ -43,9 +43,9 @@ namespace Three_Dimensional_V3
             pos.Y += velocity.Y;
             pos.Z += velocity.Z;
 
-            velocity.X += Convert.ToSingle(Math.Cos(dirXZ));
+            velocity.X += Convert.ToSingle(Math.Cos(dirXZ)) * 6;
             velocity.Y += 30f / 60f;
-            velocity.Z += Convert.ToSingle(Math.Sin(dirXZ));
+            velocity.Z += Convert.ToSingle(Math.Sin(dirXZ)) * 6;
 
             velocity.X *= 0.8f;
             velocity.Z *= 0.8f;

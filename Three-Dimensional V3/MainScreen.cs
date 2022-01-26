@@ -21,8 +21,7 @@ namespace Three_Dimensional_V3
          * -- TO DO --
          * 
          * Tuesday:
-         * ~ Enemy testing, and collisions
-         * ~ Killing enemies
+         * ~ Killing enemies & enemies that shoot
          * ~ HP, Energy
          * ~ Floating text?
          * ~ Start level creation
@@ -41,6 +40,9 @@ namespace Three_Dimensional_V3
          * ~ Collisions to floors
          * ~ Collisions to walls
          * ~ Laser gun shooting
+         * ~ Enemy testing, and collisions
+         * ~ Cursor movement
+         * 
          * 
         */
 
@@ -96,6 +98,7 @@ namespace Three_Dimensional_V3
         int objCreateTime;
         int zBufferTime;
         int drawTime;
+        int totalTris = 0;
 
         /** SHAPE RELATED VARIABLES **/
         List<Object> objs = new List<Object>();
@@ -175,82 +178,99 @@ namespace Three_Dimensional_V3
             objs.Add(new Object(tempTris, location, new Point3(0, 0, 0)));
         }
 
-        void newCube(Point3 location, Point3 size, Point3 rotation, Color _c)
+        void newCube(Point3 location, Point3 size, Point3 rotation, Color _c, bool missingBottom = false, bool missingTop = false, bool missingLeft = false, bool missingRight = false, bool missingFront = false, bool missingBack = false)
         {
-            // Create 12 triangles, 2 for each side
-            objs.Add(new Object(new List<Triangle3>() {
+            List<Triangle3> temp = new List<Triangle3>();
+            if (!missingFront)
+            {
                 // Front
-                new Triangle3( new Point3[] {
+                temp.Add(new Triangle3(new Point3[] {
                     new Point3(-size.X, -size.Y, -size.Z),
                     new Point3(-size.X, size.Y, -size.Z),
                     new Point3(size.X, -size.Y, -size.Z),
-                }, _c),
-                new Triangle3( new Point3[] {
+                }, _c));
+                temp.Add(new Triangle3(new Point3[] {
                     new Point3(size.X, size.Y, -size.Z),
                     new Point3(-size.X, size.Y, -size.Z),
                     new Point3(size.X, -size.Y, -size.Z),
-                }, _c),
-                // Right Side
-                
-                new Triangle3( new Point3[] {
+                }, _c));
+            }
+
+            if (!missingRight)
+            {
+                // Right side
+                temp.Add(new Triangle3(new Point3[] {
                     new Point3(size.X, -size.Y, -size.Z),
                     new Point3(size.X, size.Y, -size.Z),
                     new Point3(size.X, -size.Y, size.Z),
-                }, _c),
-                new Triangle3( new Point3[] {
+                }, _c));
+                temp.Add(new Triangle3(new Point3[] {
                     new Point3(size.X, size.Y, size.Z),
                     new Point3(size.X, size.Y, -size.Z),
                     new Point3(size.X, -size.Y, size.Z),
-                }, _c),
+                }, _c));
+            }
 
-                // Left Side
-                new Triangle3( new Point3[] {
+            if (!missingLeft)
+            {
+                // Left side
+                temp.Add(new Triangle3(new Point3[] {
                     new Point3(-size.X, -size.Y, -size.Z),
                     new Point3(-size.X, size.Y, -size.Z),
                     new Point3(-size.X, -size.Y, size.Z),
-                }, _c),
-                new Triangle3( new Point3[] {
+                }, _c));
+                temp.Add(new Triangle3(new Point3[] {
                     new Point3(-size.X, size.Y, size.Z),
                     new Point3(-size.X, size.Y, -size.Z),
                     new Point3(-size.X, -size.Y, size.Z),
-                }, _c),
+                }, _c));
+            }
 
-                // Back Side
-                new Triangle3( new Point3[] {
+            if (!missingBack)
+            {
+                //Back Side
+                temp.Add(new Triangle3(new Point3[] {
                     new Point3(-size.X, -size.Y, size.Z),
                     new Point3(-size.X, size.Y, size.Z),
                     new Point3(size.X, -size.Y, size.Z),
-                }, _c),
-                new Triangle3( new Point3[] {
+                }, _c));
+                temp.Add(new Triangle3(new Point3[] {
                     new Point3(size.X, size.Y, size.Z),
                     new Point3(-size.X, size.Y, size.Z),
                     new Point3(size.X, -size.Y, size.Z),
-                }, _c),
+                }, _c));
+            }
 
-                // Top Side
-                new Triangle3( new Point3[] {
+            if (!missingTop)
+            {
+                // Top side
+                temp.Add(new Triangle3(new Point3[] {
                     new Point3(-size.X, -size.Y, -size.Z),
                     new Point3(-size.X, -size.Y, size.Z),
                     new Point3(size.X, -size.Y, -size.Z),
-                }, _c),
-                new Triangle3( new Point3[] {
+                }, _c));
+                temp.Add(new Triangle3(new Point3[] {
                     new Point3(size.X, -size.Y, size.Z),
                     new Point3(-size.X, -size.Y, size.Z),
                     new Point3(size.X, -size.Y, -size.Z),
-                }, _c),
-                
-                // Bottom Side
-                new Triangle3( new Point3[] {
+                }, _c));
+            }
+
+            if (!missingBottom) {
+                // Bottom side
+                temp.Add(new Triangle3(new Point3[] {
                     new Point3(-size.X, size.Y, -size.Z),
                     new Point3(-size.X, size.Y, size.Z),
                     new Point3(size.X, size.Y, -size.Z),
-                }, _c),
-                new Triangle3( new Point3[] {
+                }, _c));
+                temp.Add(new Triangle3(new Point3[] {
                     new Point3(size.X, size.Y, size.Z),
                     new Point3(-size.X, size.Y, size.Z),
                     new Point3(size.X, size.Y, -size.Z),
-                }, _c),
-            }, location, rotation));
+                }, _c));
+            }
+            // Create 12 triangles, 2 for each side
+            objs.Add(new Object(temp, location, rotation));
         }
 
         void newCylinder(Point3 location, Point3 size, float columns, Point3 rotation, Color _c)
@@ -355,15 +375,17 @@ namespace Three_Dimensional_V3
         {
             trisToSort.Clear();
             objInts.Clear();
+            totalTris = 0;
 
             // Split triangles
             foreach(Object obj in objs)
             {
                 int oldTrisCount = 0;
                 oldTrisCount += obj.tris.Count;
+                totalTris += obj.tris.Count;
                 for (int j = 0;j < oldTrisCount;j ++)
                 {
-                    obj.tris[j].TriangleMaxDist(400, obj.tris);
+                    obj.tris[j].TriangleMaxDist(500, obj.tris);
                 }
                 for(int i = obj.tris.Count-1; i >= 0; i--)
                 {
@@ -417,7 +439,7 @@ namespace Three_Dimensional_V3
                 keys[i] = false;
             }
 
-            enemies.Add(new Enemy(new Point3(-500, -200, -1500), "crawler"));
+            enemies.Add(new Enemy(new Point3(0, -200, 0), "crawler"));
 
             // Set position
         }
@@ -455,14 +477,32 @@ namespace Three_Dimensional_V3
             Form1.maxid = 0;
 
             // Add objects
+            cols.Clear();
             //newCylinder(new Point3(150, -100, 1000), new Point3(150, 100, 50), 36, new Point3(test, test, test), Color.Yellow);
             //newSphere(new Point3(p.pos.X, p.pos.Y-70, p.pos.Z), 60, 8, 16, Color.LimeGreen);
             //newCube(p.pos, p.size, new Point3(0, 0, 0), Color.LimeGreen);
             //newCone(new Point3(-150, -100, 1000), 50, 100, 12, new Point3(test, test, test), Color.Purple);
-            newCube(new Point3(150, -300, 700), new Point3(100, 100, 100), new Point3(0, 0, 0), Color.DarkSlateGray);
-            newPlane(new Point3(0, 0, 1000), new PointF(2000, 2000), new Point3(0, 0, 0), Color.Gray);
+            //newCube(new Point3(150, -300, 700), new Point3(100, 100, 100), new Point3(0, 0, 0), Color.DarkSlateGray, missingBottom: true, missingRight: true, missingFront: true, missingBack: true);
+            //newPlane(new Point3(0, 0, 0), new PointF(2000, 2000), new Point3(0, 0, 0), Color.Gray);
+            //newPlane(new Point3(0, -50, -4100), new PointF(2000, 2000), new Point3(0, 0, 0), Color.Red);
 
-            foreach(Bullet b in bullets)
+            // Add collision objects
+            int k = 0;
+            for(int i = Convert.ToInt16(p.pos.X/400f)-8;i <= Convert.ToInt16(p.pos.X / 400f) + 8;i++)
+            {
+                for(int j = Convert.ToInt16(p.pos.Z / 400f) - 8;j <= Convert.ToInt16(p.pos.Z / 400f) + 8; j++)
+                {
+                    newCube(new Point3(i * 400, 100, j * 400), new Point3(200, 0, 200), new Point3(0, 0, 0), (i + j) % 2 == 0 ? Color.Black : Color.LightSlateGray, missingBottom: true, missingFront: true, missingLeft: true, missingBack: true, missingRight: true);
+                    cols.Add(new Collision(new Point3(i * 400, 100, j * 400), new Point3(200, 0, 200), "cube"));
+                    k++;
+                }
+            }
+
+            //cols.Add(new Collision(new Point3(0, 0, 0), new Point3(2000, 0, 2000), "plane"));
+            //cols.Add(new Collision(new Point3(150, -300, 700), new Point3(100, 100, 100), "cube"));
+            //cols.Add(new Collision(new Point3(0, -50, -4100), new Point3(2000, 0, 2000), "plane"));
+
+            foreach (Bullet b in bullets)
             {
                 newSphere(b.pos, 10, 6, 12, Color.LimeGreen);
                 b.Move();
@@ -474,7 +514,7 @@ namespace Three_Dimensional_V3
 
             foreach (Enemy enemy in enemies)
             {
-                newCube(enemy.pos, enemy.size, new Point3(0, 0, 0), enemy.type == "crawler" ? Color.DarkRed : Color.DarkTurquoise);
+                newCube(new Point3(enemy.pos.X, enemy.pos.Y-5, enemy.pos.Z), enemy.size, new Point3(0, 0, 0), enemy.type == "crawler" ? Color.DarkRed : Color.DarkTurquoise);
             }
 
             for (int i = bullets.Count-1;i >= 0;i--)
@@ -485,10 +525,6 @@ namespace Three_Dimensional_V3
                 }
             }
 
-            // Add collision objects
-            cols.Clear();
-            cols.Add(new Collision(new Point3(0, 0, 1000), new Point3(2000, 0, 2000), "plane"));
-            cols.Add(new Collision(new Point3(150, -300, 700), new Point3(100, 100, 100), "cube"));
 
 
 
@@ -609,7 +645,7 @@ namespace Three_Dimensional_V3
 
             // Get FPS
             drawTime = getMillisSinceLast();
-            //e.Graphics.DrawString($"FPS: {fps}\nTris: {h}/{i}\nCreate Time: {objCreateTime}ms\nZ Buffer Time: {zBufferTime}ms\nDraw Time: {drawTime}ms", DefaultFont, new SolidBrush(Color.Black), new PointF(10, 10));
+            e.Graphics.DrawString($"FPS: {fps}\nTris: {h}/{totalTris}\nCreate Time: {objCreateTime}ms\nZ Buffer Time: {zBufferTime}ms\nDraw Time: {drawTime}ms", DefaultFont, new SolidBrush(Color.Black), new PointF(10, 10));
         }
 
         /** KEYBOARD **/
