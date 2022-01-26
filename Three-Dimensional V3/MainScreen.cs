@@ -667,6 +667,10 @@ namespace Three_Dimensional_V3
                 if (Math.Sqrt(Math.Pow(p.pos.X - enemy.pos.X, 2) + Math.Pow(p.pos.Y - enemy.pos.Y, 2) + Math.Pow(p.pos.Z - enemy.pos.Z, 2)) < camera.maximumRenderDistance/1.3f)
                 {
                     enemy.Move(cols, p);
+                    if(mode == 0 && enemy.pos.Y > -1500)
+                    {
+                        enemy.health--;
+                    }
                 }
             }
 
@@ -731,7 +735,7 @@ namespace Three_Dimensional_V3
 
             // Get FPS
             drawTime = getMillisSinceLast();
-            e.Graphics.DrawString($"FPS: {fps}\nTris: {h}/{totalTris}\nCreate Time: {objCreateTime}ms\nZ Buffer Time: {zBufferTime}ms\nDraw Time: {drawTime}ms", DefaultFont, new SolidBrush(Color.Black), new PointF(10, 10));
+            e.Graphics.DrawString($"FPS: {fps}\nTris: {h}/{totalTris}\nCreate Time: {objCreateTime}ms\nZ Buffer Time: {zBufferTime}ms\nDraw Time: {drawTime}ms\nEnemy Count: {enemies.Count}", DefaultFont, new SolidBrush(Color.Black), new PointF(10, 10));
         }
 
         /** KEYBOARD **/
