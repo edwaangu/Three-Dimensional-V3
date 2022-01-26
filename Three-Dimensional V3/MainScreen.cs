@@ -457,7 +457,7 @@ namespace Three_Dimensional_V3
             // Add enemies
             if (mode == 1)
             {
-                enemies.Add(new Enemy(new Point3(0, -200, 0), "crawler"));
+                enemies.Add(new Enemy(new Point3(500, -200, 0), "crawler"));
             }
             else
             {
@@ -693,7 +693,7 @@ namespace Three_Dimensional_V3
             cursorIncrease.X *= 0.6f;
             cursorIncrease.Y *= 0.6f;
 
-            if(p.pos.Y > 3500)
+            if(p.pos.Y > 3500 && mode == 0)
             {
                 p.pos = new Point3(0, -3500, 0);
                 p.velocity.Y = 0;
