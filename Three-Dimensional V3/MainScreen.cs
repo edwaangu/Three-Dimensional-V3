@@ -74,7 +74,7 @@ namespace Three_Dimensional_V3
         Random randGen = new Random();
 
         /** CAMERA RELATED VARIABLES **/
-        Camera camera = new Camera(70, new Point3(0, 0, 0), new PointF(0, 0), 3000); // Camera
+        Camera camera = new Camera(70, new Point3(0, 0, 0), new PointF(0, 0), 10000); // Camera
         bool[] keys = new bool[256];
 
         /** FPS RELATED VARIABLES **/
@@ -376,7 +376,7 @@ namespace Three_Dimensional_V3
                 oldTrisCount += obj.tris.Count;
                 for (int j = 0;j < oldTrisCount;j ++)
                 {
-                    obj.tris[j].TriangleMaxDist(400, obj.tris);
+                    obj.tris[j].TriangleMaxDist(50, obj.tris, camera, obj);
                 }
                 for(int i = obj.tris.Count-1; i >= 0; i--)
                 {
@@ -453,11 +453,11 @@ namespace Three_Dimensional_V3
 
             // Add objects
             
-            newCylinder(new Point3(150, -100, 1000), new Point3(150, 100, 50), 36, new Point3(test, test, test), Color.Yellow);
-            newSphere(new Point3(450, -100, 1000), 100, 8, 16, Color.Blue);
-            newCube(new Point3(-450, -100, 1000), new Point3(100, 100, 100), new Point3(test, test, test), Color.LimeGreen);
-            newCone(new Point3(-150, -100, 1000), 50, 100, 12, new Point3(test, test, test), Color.Purple);
-            newPlane(new Point3(0, 100, 1000), new PointF(2000, 2000), new Point3(0, 0, 0), Color.Red);
+            //newCylinder(new Point3(150, -100, 1000), new Point3(150, 100, 50), 36, new Point3(test, test, test), Color.Yellow);
+            //newSphere(new Point3(450, -100, 1000), 100, 8, 16, Color.Blue);
+            //newCube(new Point3(-450, -100, 1000), new Point3(100, 100, 100), new Point3(test, test, test), Color.LimeGreen);
+            //newCone(new Point3(-150, -100, 1000), 50, 100, 12, new Point3(test, test, test), Color.Purple);
+            newPlane(new Point3(0, 100, 0), new PointF(4000, 4000), new Point3(5, 0, 0), Color.Red);
 
             objCreateTime = getMillisSinceLast();
 
@@ -525,8 +525,8 @@ namespace Three_Dimensional_V3
             foreach (SortingTriangle3 tri in trisToSort)
             {
                 i++;
-                e.Graphics.FillPolygon(new SolidBrush(tri.tri.mainColor), tri.tri.PointsOnScreen(camera, tri.obj, res));
-                //e.Graphics.DrawPolygon(new Pen(Color.Black, 2), ps);
+                //e.Graphics.FillPolygon(new SolidBrush(tri.tri.mainColor), tri.tri.PointsOnScreen(camera, tri.obj, res));
+                e.Graphics.DrawPolygon(new Pen(Color.Black, 2), tri.tri.PointsOnScreen(camera, tri.obj, res));
                 h++;
             }
             e.Graphics.ResetTransform();

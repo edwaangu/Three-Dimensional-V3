@@ -9,16 +9,16 @@ namespace Three_Dimensional_V3
 {
     internal class Triangle3
     {
-        public Point3[] points = new Point3[3];
+        public Point3[] points = new Point3[3]; // Actual location of the points
 
-        public Point3[] oldPoints = new Point3[3];
+        public Point3[] oldPoints = new Point3[3]; // Mapped points based on object and camera position/rotations
 
         public Color mainColor;
 
         public float saidZ;
-        public bool isKill = false;
+        public bool isKill = false; // Determining whether or not to "kill" this triangle
 
-        public bool isCutTriangle = false;
+        public bool isCutTriangle = false; // For determining whether this triangle was cut from another triangle
 
         public Triangle3(Point3[] _points, Color _mainColor)
         {
@@ -351,13 +351,33 @@ namespace Three_Dimensional_V3
             }
         }
 
+        // Used to get the distance between three-dimensional points
         float GetDistanceBetweenPoints(Point3 _p1, Point3 _p2)
         {
             return Convert.ToSingle(Math.Sqrt(Math.Pow(_p2.X - _p1.X, 2) + Math.Pow(_p2.Y - _p1.Y, 2) + Math.Pow(_p2.Z - _p1.Z, 2)));
         }
 
-        public void TriangleMaxDist(int maxdist, List<Triangle3> _tris)
+        Point3 AddPointsTogether(Point3 _p1, Point3 _p2)
         {
+            return new Point3(_p1.X - _p2.X, _p1.Y - _p2.Y, _p1.Z - _p2.Z);
+        }
+
+        // Function for splitting triangles
+        public void TriangleMaxDist(int maxdist, List<Triangle3> _tris, Camera camera, Object _obj)
+        {
+            float maxdist0 = GetDistanceBetweenPoints(points[0], AddPointsTogether(camera.pos, _obj.pos));
+            float maxdist1 = GetDistanceBetweenPoints(points[1], AddPointsTogether(camera.pos, _obj.pos));
+            float maxdist2 = GetDistanceBetweenPoints(points[2], AddPointsTogether(camera.pos, _obj.pos));
+
+            float maxdistavg = (maxdist0 < maxdist1 && maxdist0 < maxdist2) ? maxdist0 : ((maxdist1 < maxdist0 && maxdist1 < maxdist2) ? maxdist1 : maxdist2);
+            //maxdistavg /= 2;
+            //maxdist = Convert.ToInt16(maxdistavg) > maxdist ? Convert.ToInt16(maxdistavg) : maxdist;
+            maxdist = Convert.ToInt16(maxdistavg) > 50 ? Convert.ToInt16(maxdistavg) : 50;
+
+            if(maxdist > 3000)
+            {
+                maxdist = 3000;
+            }
 
             float dist0 = GetDistanceBetweenPoints(points[1], points[2]);
             float dist1 = GetDistanceBetweenPoints(points[0], points[2]);
@@ -382,14 +402,14 @@ namespace Three_Dimensional_V3
                         new Point3(points[0].X, points[0].Y, points[0].Z),
                         new Point3(points[1].X, points[1].Y, points[1].Z)
                         }, mainColor));
-                        _tris[_tris.Count - 1].TriangleMaxDist(maxdist, _tris);
+                        _tris[_tris.Count - 1].TriangleMaxDist(maxdist, _tris, camera, _obj);
                         _tris.Add(new Triangle3(new Point3[]
                         {
                         new Point3(avgX, avgY, avgZ),
                         new Point3(points[0].X, points[0].Y, points[0].Z),
                         new Point3(points[2].X, points[2].Y, points[2].Z)
                         }, mainColor));
-                        _tris[_tris.Count - 1].TriangleMaxDist(maxdist, _tris);
+                        _tris[_tris.Count - 1].TriangleMaxDist(maxdist, _tris, camera, _obj);
                     }
                 }
                 else if (dist1 >= dist0 && dist1 >= dist2)
@@ -406,14 +426,14 @@ namespace Three_Dimensional_V3
                         new Point3(points[0].X, points[0].Y, points[0].Z),
                         new Point3(points[1].X, points[1].Y, points[1].Z)
                         }, mainColor));
-                        _tris[_tris.Count - 1].TriangleMaxDist(maxdist, _tris);
+                        _tris[_tris.Count - 1].TriangleMaxDist(maxdist, _tris, camera, _obj);
                         _tris.Add(new Triangle3(new Point3[]
                         {
                         new Point3(avgX, avgY, avgZ),
                         new Point3(points[0].X, points[0].Y, points[0].Z),
                         new Point3(points[2].X, points[2].Y, points[2].Z)
                         }, mainColor));
-                        _tris[_tris.Count - 1].TriangleMaxDist(maxdist, _tris);
+                        _tris[_tris.Count - 1].TriangleMaxDist(maxdist, _tris, camera, _obj);
                     }
                 }
                 else
@@ -430,20 +450,21 @@ namespace Three_Dimensional_V3
                         new Point3(points[2].X, points[2].Y, points[2].Z),
                         new Point3(points[1].X, points[1].Y, points[1].Z)
                         }, mainColor));
-                        _tris[_tris.Count - 1].TriangleMaxDist(maxdist, _tris);
+                        _tris[_tris.Count - 1].TriangleMaxDist(maxdist, _tris, camera, _obj);
                         _tris.Add(new Triangle3(new Point3[]
                         {
                         new Point3(avgX, avgY, avgZ),
                         new Point3(points[2].X, points[2].Y, points[2].Z),
                         new Point3(points[0].X, points[0].Y, points[0].Z)
                         }, mainColor));
-                        _tris[_tris.Count - 1].TriangleMaxDist(maxdist, _tris);
+                        _tris[_tris.Count - 1].TriangleMaxDist(maxdist, _tris, camera, _obj);
                     }
                 }
                 isKill = true;
             }
         }
-
+        
+        // Reset position of future points
         void TrianglePointsReset()
         {
             oldPoints = new Point3[3];
@@ -453,6 +474,7 @@ namespace Three_Dimensional_V3
             }
         }
 
+        // Translate position of future points by the "object's" center
         void TranslateByObject(Object _obj)
         {
             for (int i = 0; i < oldPoints.Length; i++)
@@ -463,6 +485,7 @@ namespace Three_Dimensional_V3
             }
         }
 
+        // Rotate position of future points by the object's rotation
         void RotateByObject(Object _obj)
         {
             float rad2Deg = Convert.ToSingle(180 / Math.PI);
@@ -511,6 +534,7 @@ namespace Three_Dimensional_V3
             }
         }
 
+        // Translate and rotate future points based on camera's position and rotation
         void TranslateByCamera(Camera _cam)
         {
             for (int i = 0; i < oldPoints.Length; i++)
@@ -543,8 +567,10 @@ namespace Three_Dimensional_V3
             }
         }
 
+        // Get triangle ready to be layered and sorted
         public void setupLayering(Camera _cam, Object _obj, PointF _resolution, List<SortingTriangle3> _tris, int debugI)
         {
+            // Only go through all of this if not a cut triangle (Cut triangles will be created after most of these processes)
             if (isCutTriangle == false)
             {
                 TrianglePointsReset();
@@ -553,9 +579,10 @@ namespace Three_Dimensional_V3
                 TranslateByCamera(_cam);
             }
 
+            // Rad to Degree converter for ease of entering angles
             float toRad = Convert.ToSingle(180 / Math.PI);
-            float Z0 = Convert.ToSingle((_resolution.X / 2) / Math.Tan((_cam.fov / 2) / toRad));
-            PointF[] thePoints = new PointF[3];
+            float Z0 = Convert.ToSingle((_resolution.X / 2) / Math.Tan((_cam.fov / 2) / toRad)); // Focal Z position
+            PointF[] thePoints = new PointF[3]; // Points to be used for displaying on screen
             if (isCutTriangle == false)
             {
                 cutoffTriangle(2, _tris, _obj, debugI);
@@ -757,7 +784,8 @@ namespace Three_Dimensional_V3
                 }
                 thePoints[i].X = theX;
                 thePoints[i].Y = theY;
-                saidZ += Convert.ToSingle(Math.Sqrt(Math.Pow(oldPoints[i].X, 2) + Math.Pow(oldPoints[i].Y, 2) + Math.Pow(oldPoints[i].Z, 2)));
+                //saidZ += Convert.ToSingle(Math.Sqrt(Math.Pow(oldPoints[i].X, 2) + Math.Pow(oldPoints[i].Y, 2) + Math.Pow(oldPoints[i].Z, 2)));
+                saidZ += theZ;
             }
             saidZ /= 3;
             ////Console.WriteLine($"saidZ of tri {thenum} is {saidZ}");
